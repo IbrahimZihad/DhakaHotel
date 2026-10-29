@@ -1,0 +1,21 @@
+# Uploaded menu images only. Never execute anything from this folder.
+
+Options -Indexes -ExecCGI
+
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+  php_flag engine off
+</IfModule>
+
+<FilesMatch "\.(php|phtml|phar|pl|py|cgi|sh|htaccess)$">
+  Require all denied
+</FilesMatch>
+
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  <FilesMatch "\.(jpe?g|png|webp)$">
+    Header set Content-Disposition "inline"
+  </FilesMatch>
+</IfModule>

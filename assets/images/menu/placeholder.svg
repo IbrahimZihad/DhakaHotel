@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-label="Meal illustration">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff1f4"/>
+      <stop offset="1" stop-color="#ffdce5"/>
+    </linearGradient>
+    <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f4e6ea"/>
+    </linearGradient>
+    <linearGradient id="dome" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4537d"/>
+      <stop offset="1" stop-color="#d93a66"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="480" fill="url(#bg)"/>
+  <circle cx="520" cy="90" r="70" fill="#ffffff" opacity=".35"/>
+  <circle cx="110" cy="400" r="90" fill="#ffffff" opacity=".25"/>
+  <ellipse cx="320" cy="380" rx="190" ry="26" fill="#2a2124" opacity=".10"/>
+  <ellipse cx="320" cy="330" rx="170" ry="46" fill="url(#plate)"/>
+  <path d="M180 322c0-92 62-158 140-158s140 66 140 158z" fill="url(#dome)"/>
+  <path d="M180 322h280" stroke="#b52c53" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="320" cy="152" r="12" fill="#fff"/>
+  <path d="M282 96c-10-18 10-26 0-44M320 88c-10-18 10-26 0-44M358 96c-10-18 10-26 0-44" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".8" fill="none"/>
+  <path d="M226 290c14-12 30-18 48-18M414 290c-14-12-30-18-48-18" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".5" fill="none"/>
+</svg>

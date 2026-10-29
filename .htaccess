@@ -1,0 +1,36 @@
+# Dhaka Hotel - Apache configuration (XAMPP / shared hosting).
+# Requires AllowOverride All for .htaccess to take effect.
+
+DirectoryIndex index.php
+
+<IfModule mod_mime.c>
+  AddType application/manifest+json .webmanifest
+  AddType image/svg+xml .svg
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Source, tooling and runtime folders are never served directly.
+  RewriteRule ^(config|database|includes|tests|vendor|storage|tools)(/|$) - [F,L]
+
+  # Optional HTTPS redirect. Enable only when the site actually has a certificate.
+  # RewriteCond %{HTTPS} !=on
+  # RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+</IfModule>
+
+<IfModule mod_authz_core.c>
+  <FilesMatch "^\.env$|^\.env\..*|^composer\.(json|lock)$|\.(sql|log|md)$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(css|js|png|jpe?g|webp|svg|woff2)$">
+    Header set Cache-Control "public, max-age=86400"
+  </FilesMatch>
+  <FilesMatch "^(service-worker\.js|manifest\.webmanifest)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>

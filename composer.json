@@ -1,0 +1,17 @@
+{
+  "name": "dhaka-hotel/restaurant",
+  "description": "Dhaka Hotel restaurant website, admin panel, single-screen POS and PWA (plain PHP + MySQL).",
+  "type": "project",
+  "license": "proprietary",
+  "require": {
+    "php": ">=8.2",
+    "ext-fileinfo": "*",
+    "ext-mbstring": "*",
+    "ext-pdo": "*",
+    "phpmailer/phpmailer": "^6.9"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
+  }
+}

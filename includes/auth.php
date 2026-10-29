@@ -44,6 +44,14 @@ function require_admin(): void
         return;
     }
 
+    if (request_wants_json()) {
+        json_response([
+            'ok' => false,
+            'error' => 'auth',
+            'message' => __('error.session_expired'),
+        ], 401);
+    }
+
     $next = $_SERVER['REQUEST_URI'] ?? '';
     redirect('admin/login.php' . ($next !== '' ? '?next=' . rawurlencode($next) : ''));
 }

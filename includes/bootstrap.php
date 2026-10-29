@@ -14,6 +14,7 @@ require DH_ROOT . '/includes/env.php';
 load_env(DH_ROOT . '/.env');
 
 require DH_ROOT . '/includes/functions.php';
+require DH_ROOT . '/includes/icons.php';
 require DH_ROOT . '/includes/database_helpers.php';
 require DH_ROOT . '/includes/validation.php';
 require DH_ROOT . '/includes/csrf.php';

@@ -48,7 +48,12 @@ function url(string $path = ''): string
 
 function asset(string $path): string
 {
-    return url('assets/' . ltrim($path, '/')) . '?v=' . config('app.asset_version', '1');
+    $path = ltrim($path, '/');
+    if (!str_starts_with($path, 'assets/')) {
+        $path = 'assets/' . $path;
+    }
+
+    return url($path) . '?v=' . config('app.asset_version', '1');
 }
 
 function upload_url(?string $relativePath): ?string
@@ -58,6 +63,26 @@ function upload_url(?string $relativePath): ?string
     }
 
     return url('uploads/' . ltrim($relativePath, '/'));
+}
+
+/**
+ * Resolve a menu image, preferring owner uploads and falling back to the
+ * bundled demo illustrations. Always returns a usable URL.
+ */
+function menu_image_url(?string $relativePath): string
+{
+    $relative = ltrim((string) $relativePath, '/');
+
+    if ($relative !== '') {
+        if (is_file(DH_ROOT . '/uploads/' . $relative)) {
+            return url('uploads/' . $relative);
+        }
+        if (is_file(DH_ROOT . '/assets/images/' . $relative)) {
+            return asset('assets/images/' . $relative);
+        }
+    }
+
+    return asset('assets/images/menu/placeholder.svg');
 }
 
 function redirect(string $path, int $code = 302): never
@@ -188,7 +213,7 @@ function parse_money_input(mixed $value): ?int
         return null;
     }
 
-    $value = trim($value);
+    $value = trim(latin_digits($value));
     if ($value === '' || !preg_match('/^\d{1,8}(\.\d{1,2})?$/', $value)) {
         return null;
     }
@@ -204,7 +229,22 @@ function bn_digits(string $value): string
     return strtr($value, $map);
 }
 
+/** Accept Bangla numerals in money fields typed by staff. */
+function latin_digits(string $value): string
+{
+    $map = ['০' => '0', '১' => '1', '২' => '2', '৩' => '3', '৪' => '4',
+            '৫' => '5', '৬' => '6', '৭' => '7', '৮' => '8', '৯' => '9'];
+
+    return strtr($value, $map);
+}
+
 function money(int $cents, bool $symbol = true): string
+{
+    return money_lang($cents, current_lang(), $symbol);
+}
+
+/** Same formatting rules but for an explicit language (receipts). */
+function money_lang(int $cents, string $lang, bool $symbol = true): string
 {
     $formatted = number_format(intdiv(abs($cents), 100));
     $fraction = abs($cents) % 100;
@@ -213,14 +253,9 @@ function money(int $cents, bool $symbol = true): string
         $formatted .= '.' . str_pad((string) $fraction, 2, '0', STR_PAD_LEFT);
     }
 
-    if ($formatted === '0') {
-        $formatted = '0';
-    }
-
     $prefix = $cents < 0 ? '−' : '';
-    if (current_lang() === 'bn') {
-        $prefix .= $symbol ? '৳' : '';
-        return $prefix . bn_digits($formatted);
+    if ($lang === 'bn') {
+        return $prefix . ($symbol ? '৳' : '') . bn_digits($formatted);
     }
 
     return $prefix . ($symbol ? '৳' : '') . $formatted;
@@ -230,6 +265,28 @@ function money(int $cents, bool $symbol = true): string
 function money_from_decimal(string $decimal, bool $symbol = true): string
 {
     return money(cents_from_decimal($decimal), $symbol);
+}
+
+function order_status_badge_class(string $status): string
+{
+    return match ($status) {
+        'pending' => 'badge-warning',
+        'confirmed', 'preparing', 'out_for_delivery' => 'badge-info',
+        'ready', 'delivered' => 'badge-success',
+        'cancelled' => 'badge-danger',
+        default => 'badge-soft',
+    };
+}
+
+function payment_status_badge_class(string $status): string
+{
+    return match ($status) {
+        'unpaid' => 'badge-warning',
+        'partial' => 'badge-info',
+        'paid' => 'badge-success',
+        'refunded' => 'badge-danger',
+        default => 'badge-soft',
+    };
 }
 
 function format_datetime(int|string|null $value, bool $withTime = true): string

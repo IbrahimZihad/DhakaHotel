@@ -639,7 +639,7 @@ function pending_pos_bills(?int $adminId = null, int $limit = 20): array
     $sql = "SELECT o.*, COUNT(oi.id) AS item_lines
             FROM orders o
             LEFT JOIN order_items oi ON oi.order_id = o.id
-            WHERE o.source = 'pos' AND o.status = 'pending' AND o.payment_status IN ('unpaid','partial')";
+            WHERE o.source = 'pos' AND o.status = 'pending' AND o.payment_status = 'unpaid'";
     $params = [];
 
     if ($adminId !== null) {

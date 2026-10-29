@@ -10,7 +10,7 @@ return [
     'demo_mode' => (bool) env('APP_DEMO_MODE', true),
     'default_lang' => 'bn',
     'languages' => ['bn', 'en'],
-    'asset_version' => '1.0.0',
+    'asset_version' => (string) env('APP_ASSET_VERSION', '1.0.0'),
     'session' => [
         'name' => (string) env('SESSION_NAME', 'dhakahotelsessid'),
         'lifetime' => (int) env('SESSION_LIFETIME', 7200),
