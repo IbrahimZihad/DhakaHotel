@@ -28,7 +28,7 @@ $topbarAdmin = admin_user();
   <a class="topbar-link" href="<?= e(url('admin/billing.php')) ?>">
     <?= icon('tablet') ?><span><?= e(__('admin.nav_billing')) ?></span>
   </a>
-  <a class="topbar-link" href="<?= e(url('index.php')) ?>" target="_blank" rel="noopener">
+  <a class="topbar-link topbar-site" href="<?= e(url('index.php')) ?>" target="_blank" rel="noopener">
     <?= icon('external') ?><span><?= e(__('admin.view_site')) ?></span>
   </a>
   <?php endif; ?>

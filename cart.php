@@ -60,6 +60,7 @@ if (is_post()) {
 $cart = cart_summary();
 $empty = $cart['items'] === [];
 $belowMinimum = !$empty && !$cart['meets_minimum'];
+$bodyClass = $empty ? '' : 'has-sticky-bar';
 
 $pageTitle = __('cart.title');
 $activeNav = 'cart';
@@ -156,7 +157,7 @@ require DH_ROOT . '/includes/partials/flash.php';
           <?php endif; ?>
 
           <div class="stack" style="margin-top:16px">
-            <a class="btn btn-lg btn-block" href="<?= e(url('checkout.php')) ?>" <?= $belowMinimum ? 'aria-disabled="true" style="pointer-events:none;opacity:.55"' : '' ?>>
+            <a class="btn btn-lg btn-block cart-checkout-desktop" href="<?= e(url('checkout.php')) ?>" <?= $belowMinimum ? 'aria-disabled="true" style="pointer-events:none;opacity:.55"' : '' ?>>
               <?= e(__('cart.checkout')) ?><?= icon('arrow-right') ?>
             </a>
             <?php $waLink = whatsapp_link(__('nav.whatsapp')); ?>
@@ -169,6 +170,16 @@ require DH_ROOT . '/includes/partials/flash.php';
           <p class="summary-note"><?= e(__('cart.delivery_note')) ?></p>
         </div>
       </aside>
+    </div>
+
+    <div class="sticky-bar">
+      <div class="sticky-total">
+        <span><?= e(__('common.total')) ?></span>
+        <b class="price"><?= money($cart['grand_total']) ?></b>
+      </div>
+      <a class="btn" href="<?= e(url('checkout.php')) ?>" <?= $belowMinimum ? 'aria-disabled="true" style="pointer-events:none;opacity:.55"' : '' ?>>
+        <?= e(__('cart.checkout')) ?><?= icon('arrow-right') ?>
+      </a>
     </div>
     <?php endif; ?>
   </div>

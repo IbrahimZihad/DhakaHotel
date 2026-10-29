@@ -123,7 +123,17 @@ $adminLayout = 'pos';
 $extraJs = ['assets/js/pos.js'];
 require DH_ROOT . '/includes/partials/admin-head.php';
 ?>
-<main class="pos-shell" id="main">
+<div class="pos-tabs" role="tablist" aria-label="<?= e(__('pos.title')) ?>">
+  <button class="pos-tab is-active" type="button" role="tab" aria-selected="true" data-pos-view="catalog">
+    <?= icon('utensils') ?><span><?= e(__('nav.menu')) ?></span>
+  </button>
+  <button class="pos-tab" type="button" role="tab" aria-selected="false" data-pos-view="bill">
+    <?= icon('receipt') ?><span><?= e(__('pos.bill')) ?></span>
+    <span class="pos-tab-count" id="pos-tab-count">0</span>
+    <b id="pos-tab-total">৳0</b>
+  </button>
+</div>
+<main class="pos-shell" id="main" data-view="catalog">
   <section class="pos-catalog" aria-label="<?= e(__('pos.title')) ?>">
     <div class="pos-toolbar">
       <div class="search-box">

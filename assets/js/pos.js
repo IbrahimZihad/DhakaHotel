@@ -151,7 +151,11 @@
     generate: byId('pos-generate'),
     print: byId('pos-print'),
     save: byId('pos-save'),
-    newBill: byId('pos-new')
+    newBill: byId('pos-new'),
+    tabCount: byId('pos-tab-count'),
+    tabTotal: byId('pos-tab-total'),
+    tabs: document.querySelectorAll('[data-pos-view]'),
+    shell: document.querySelector('.pos-shell')
   };
 
   if (!els.grid || !els.lines || !els.type) {
@@ -308,6 +312,17 @@
     els.taxRate.textContent = taxRateText();
     els.tax.textContent = formatMoney(totals.tax);
     els.total.textContent = formatMoney(totals.grandTotal);
+
+    if (els.tabTotal) {
+      els.tabTotal.textContent = formatMoney(totals.grandTotal);
+    }
+    if (els.tabCount) {
+      var itemCount = 0;
+      state.lines.forEach(function (line) {
+        itemCount += line.quantity;
+      });
+      els.tabCount.textContent = localNumber(itemCount);
+    }
 
     if (els.method.value === 'cash' && !state.receivedTouched && !state.locked) {
       els.received.value = totals.grandTotal > 0 ? decimalFromCents(totals.grandTotal) : '';
@@ -803,6 +818,20 @@
       if (chip) {
         setCategory(parseInt(chip.getAttribute('data-cat'), 10) || 0);
       }
+    });
+  }
+
+  if (els.tabs.length && els.shell) {
+    els.tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        var view = tab.getAttribute('data-pos-view') === 'bill' ? 'bill' : 'catalog';
+        els.shell.setAttribute('data-view', view);
+        els.tabs.forEach(function (other) {
+          var active = other === tab;
+          other.classList.toggle('is-active', active);
+          other.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+      });
     });
   }
 

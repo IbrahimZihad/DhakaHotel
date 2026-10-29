@@ -128,6 +128,7 @@ if (is_post()) {
 
 $pageTitle = __('checkout.title');
 $activeNav = 'cart';
+$bodyClass = 'has-sticky-bar';
 require DH_ROOT . '/includes/partials/site-head.php';
 require DH_ROOT . '/includes/partials/site-header.php';
 require DH_ROOT . '/includes/partials/flash.php';
@@ -267,7 +268,7 @@ require DH_ROOT . '/includes/partials/flash.php';
               <li class="total"><span><?= e(__('common.total')) ?></span><span><?= money($bill['grand_total']) ?></span></li>
             </ul>
 
-            <button class="btn btn-lg btn-block" type="submit" style="margin-top:16px" id="place-order-btn">
+            <button class="btn btn-lg btn-block checkout-submit-desktop" type="submit" style="margin-top:16px" id="place-order-btn">
               <?= icon('check') ?><span><?= e(__('checkout.place_order')) ?></span>
             </button>
             <p class="summary-note"><?= e(__('checkout.delivery_only_note')) ?></p>
@@ -276,6 +277,16 @@ require DH_ROOT . '/includes/partials/flash.php';
         </aside>
       </div>
     </form>
+
+    <div class="sticky-bar">
+      <div class="sticky-total">
+        <span><?= e(__('common.total')) ?></span>
+        <b class="price"><?= money($bill['grand_total']) ?></b>
+      </div>
+      <button class="btn btn-lg" type="submit" form="checkout-form">
+        <?= icon('check') ?><span><?= e(__('checkout.place_order')) ?></span>
+      </button>
+    </div>
   </div>
 </main>
 <?php require DH_ROOT . '/includes/partials/site-footer.php'; ?>
