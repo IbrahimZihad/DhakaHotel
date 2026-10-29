@@ -109,7 +109,12 @@
 
 .admin-main { flex: 1; width: 100%; max-width: 1320px; margin-inline: auto; padding: 20px 16px 48px; }
 @media (min-width: 900px) {
-  .admin-main { padding: 26px 28px 56px; margin-left: calc(var(--sidebar-w) + 0px); max-width: none; }
+  .admin-main {
+    padding: 26px 28px 56px;
+    margin-left: var(--sidebar-w);
+    width: calc(100% - var(--sidebar-w));
+    max-width: none;
+  }
 }
 
 .admin-sidebar {
@@ -149,8 +154,17 @@
   color: var(--a-muted);
   min-height: 42px;
 }
-.sidebar-nav a svg { width: 19px; height: 19px; flex: none; }
+.sidebar-nav a svg,
+.sidebar-nav button svg { width: 19px; height: 19px; flex: none; }
 .sidebar-nav a:hover { background: var(--green-50); color: var(--green-700); }
+.sidebar-nav form { margin: 0; }
+.sidebar-nav form button {
+  background: none;
+  border: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+.sidebar-nav form button:hover { background: #fdeceb; }
 .sidebar-nav a[aria-current="page"] {
   background: var(--green-500);
   color: #fff;
@@ -273,6 +287,7 @@ html[lang="bn"] .table th { text-transform: none; letter-spacing: 0; }
 .table tbody tr:last-child td { border-bottom: 0; }
 .table tbody tr:hover { background: #fafcf9; }
 .table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.table td > svg { width: 16px; height: 16px; }
 .table .actions { display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; }
 .table .thumb {
   width: 44px; height: 44px;

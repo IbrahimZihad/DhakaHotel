@@ -322,7 +322,7 @@ require DH_ROOT . '/includes/partials/admin-head.php';
           <?= csrf_field() ?>
           <input type="hidden" name="action" value="status">
           <div class="field">
-            <label for="new_status"><?= e(__('common.status')) ?></label>
+            <label for="new_status"><?= e(__('admin.next_status')) ?></label>
             <select class="select" id="new_status" name="new_status" required>
               <?php foreach ($transitions as $next): ?>
               <option value="<?= e($next) ?>"><?= e(order_status_label($next)) ?></option>

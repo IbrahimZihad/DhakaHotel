@@ -235,15 +235,15 @@ require DH_ROOT . '/includes/partials/admin-head.php';
       <div class="panel-body form-section">
         <div class="form-row three">
           <div class="field">
-            <label for="delivery_fee"><?= e(__('admin.delivery_fee')) ?> (৳)</label>
+            <label for="delivery_fee"><?= e(__('admin.delivery_fee')) ?></label>
             <input class="input" type="text" id="delivery_fee" name="delivery_fee" value="<?= e($form['delivery_fee']) ?>" inputmode="decimal" required>
           </div>
           <div class="field">
-            <label for="minimum_order"><?= e(__('admin.minimum_order')) ?> (৳)</label>
+            <label for="minimum_order"><?= e(__('admin.minimum_order')) ?></label>
             <input class="input" type="text" id="minimum_order" name="minimum_order" value="<?= e($form['minimum_order']) ?>" inputmode="decimal" required>
           </div>
           <div class="field">
-            <label for="tax_percent"><?= e(__('admin.tax_percent')) ?> (%)</label>
+            <label for="tax_percent"><?= e(__('admin.tax_percent')) ?></label>
             <input class="input" type="text" id="tax_percent" name="tax_percent" value="<?= e($form['tax_percent']) ?>" inputmode="decimal" required>
             <p class="hint"><?= e(__('admin.tax_hint')) ?></p>
           </div>
