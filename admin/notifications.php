@@ -119,7 +119,7 @@ require DH_ROOT . '/includes/partials/admin-head.php';
             <a href="<?= e(url('admin/order-details.php?id=' . (int) $notification['order_id'])) ?>" style="font-family:ui-monospace,Menlo,monospace;font-size:0.78rem"><?= e($notification['order_number']) ?></a>
             <?php else: ?>—<?php endif; ?>
           </td>
-          <td data-label="<?= e(__('admin.recipient')) ?>"><?= e($notification['recipient']) ?></td>
+          <td data-label="<?= e(__('admin.recipient')) ?>" class="span"><?= e($notification['recipient']) ?></td>
           <td data-label="<?= e(__('common.status')) ?>"><span class="badge <?= e($statusBadge[$notification['status']] ?? 'badge-soft') ?>"><?= e($statusLabel[$notification['status']] ?? $notification['status']) ?></span></td>
           <td data-label="<?= e(__('admin.attempts')) ?>"><?= e((string) (int) $notification['attempts']) ?></td>
           <td data-label="<?= e(__('admin.created')) ?>" class="nowrap"><?= e(format_datetime($notification['created_at'])) ?></td>

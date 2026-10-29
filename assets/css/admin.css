@@ -370,6 +370,8 @@ html[lang="bn"] .table th { text-transform: none; letter-spacing: 0; }
   .table.responsive td:has(.thumb) { grid-column: 1 / -1; }
   .table.responsive td.actions { grid-column: 1 / -1; justify-content: flex-start; padding-top: 8px; }
   .table.responsive td.num { text-align: left; }
+  /* Datetimes are wider than a half-row column; give them the full row. */
+  .table.responsive td.nowrap { grid-column: 1 / -1; white-space: normal; }
   .table.responsive .nowrap,
   .table.responsive td .nowrap { white-space: normal; }
   .table.responsive .thumb { width: 40px; height: 40px; }
@@ -867,6 +869,11 @@ html[lang="bn"] .table th { text-transform: none; letter-spacing: 0; }
 .pos-actions .btn-primary-pos:hover { background: var(--green-600); }
 .pos-actions .btn-ghost { border-color: #cfdccf; color: #4a5a4d; }
 .pos-actions .btn-ghost:hover { background: #f4f7f4; }
+@media (min-width: 1000px) {
+  /* Two action rows instead of three so the pinned bar covers less of the bill. */
+  .pos-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pos-actions .btn-primary-pos { grid-column: 1 / -1; }
+}
 
 .pos-pending-strip {
   display: flex;
