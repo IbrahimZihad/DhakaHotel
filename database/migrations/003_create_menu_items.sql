@@ -1,0 +1,26 @@
+-- 003: bilingual menu items with DECIMAL pricing
+CREATE TABLE IF NOT EXISTS menu_items (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    category_id INT UNSIGNED NOT NULL,
+    name_bn VARCHAR(120) NOT NULL,
+    name_en VARCHAR(120) NOT NULL,
+    description_bn TEXT NULL,
+    description_en TEXT NULL,
+    price DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    image_path VARCHAR(255) NULL,
+    is_available TINYINT(1) NOT NULL DEFAULT 1,
+    is_featured TINYINT(1) NOT NULL DEFAULT 0,
+    is_demo TINYINT(1) NOT NULL DEFAULT 0,
+    demo_key VARCHAR(60) NULL,
+    sort_order INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_menu_demo_key (demo_key),
+    KEY idx_menu_category (category_id, is_available, sort_order),
+    KEY idx_menu_featured (is_featured, is_available),
+    KEY idx_menu_name_en (name_en),
+    KEY idx_menu_name_bn (name_bn),
+    CONSTRAINT chk_menu_price CHECK (price >= 0),
+    CONSTRAINT fk_menu_category FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

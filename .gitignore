@@ -1,0 +1,21 @@
+# Local environment (never commit credentials)
+.env
+
+# Composer
+/vendor/
+
+# Runtime data
+/uploads/menu/*
+!/uploads/menu/.gitkeep
+/storage/
+*.log
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local tooling
+/tools/
+/node_modules/
