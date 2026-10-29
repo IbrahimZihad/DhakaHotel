@@ -673,6 +673,9 @@ html[lang="bn"] .table th { text-transform: none; letter-spacing: 0; }
   background: #fff;
   border-left: 1px solid var(--a-line);
   height: 100%;
+  /* Bill content is taller than most laptop viewports; scroll the pane, pin the actions. */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Mobile: tab between the menu and the bill instead of stacking both */
@@ -732,20 +735,11 @@ html[lang="bn"] .table th { text-transform: none; letter-spacing: 0; }
   .pos-bill {
     border-left: 0;
     border-top: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
   }
   .pos-bill-head,
   .pos-bill-meta,
   .pos-totals,
   .pos-pay { flex: none; }
-  .pos-lines { flex: none; min-height: 0; overflow: visible; }
-  .pos-actions {
-    position: sticky;
-    bottom: 0;
-    z-index: 3;
-    box-shadow: 0 -8px 20px rgba(28, 63, 32, 0.1);
-  }
 }
 .pos-bill-head {
   display: flex;
@@ -769,9 +763,8 @@ html[lang="bn"] .table th { text-transform: none; letter-spacing: 0; }
 .pos-bill-meta .field > label { font-size: 0.68rem; }
 
 .pos-lines {
-  flex: 1;
-  min-height: 90px;
-  overflow-y: auto;
+  flex: none;
+  min-height: 0;
   padding: 4px 12px;
 }
 .pos-line {
@@ -860,6 +853,10 @@ html[lang="bn"] .table th { text-transform: none; letter-spacing: 0; }
   padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--a-line);
   background: #fff;
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  box-shadow: 0 -8px 20px rgba(28, 63, 32, 0.1);
 }
 .pos-actions .btn { min-height: 44px; font-size: 0.8rem; padding-inline: 10px; }
 .pos-actions .btn-primary-pos {
