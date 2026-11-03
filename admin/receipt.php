@@ -33,6 +33,7 @@ $paidCents = order_paid_cents($orderId);
 $balanceCents = balance_due($grandCents, $paidCents);
 
 $name = restaurant_name_for($rlang);
+$proprietor = restaurant('owner_name', $rlang);
 $address = setting('address_' . $rlang, '') ?: setting('address_en', '');
 $phone = (string) setting('phone', '');
 $footer = setting('receipt_footer_' . $rlang, '') ?: setting('receipt_footer_en', '');
@@ -83,6 +84,7 @@ $paperLabels = [
 <article class="receipt" data-paper="<?= e($paper) ?>">
   <div class="r-center">
     <div class="r-brand"><?= e($name) ?></div>
+    <?php if ($proprietor !== ''): ?><div class="r-sub"><?= e(trans('receipt.proprietor', $rlang)) ?>: <?= e($proprietor) ?></div><?php endif; ?>
     <?php if ($address !== ''): ?><div class="r-sub"><?= e($address) ?></div><?php endif; ?>
     <?php if ($phone !== ''): ?><div class="r-sub"><?= e($phone) ?></div><?php endif; ?>
   </div>

@@ -652,6 +652,7 @@ return [
     'pos.bill_locked' => 'This bill can no longer be edited because a payment was recorded or the bill was closed.',
 
     // Receipt --------------------------------------------------------------
+    'receipt.proprietor' => 'Proprietor',
     'receipt.bill' => 'Bill',
     'receipt.date' => 'Date',
     'receipt.order_type' => 'Order type',
