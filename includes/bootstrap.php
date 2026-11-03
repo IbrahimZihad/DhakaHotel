@@ -104,6 +104,11 @@ header(
 
 /* -------------------------------------------------------------------------
  * Language switching (?lang=bn|en) - preserves the current page and query
+ *
+ * The choice is remembered and the page rendered here instead of bouncing:
+ * these URLs are the hreflang targets in site-head, and an alternate that
+ * answers 302 is dropped rather than credited. Dropping the parameter from
+ * $_GET also keeps it out of the pagination links built further down.
  * ---------------------------------------------------------------------- */
 if (isset($_GET['lang'])) {
     $requested = strtolower((string) $_GET['lang']);
@@ -112,14 +117,5 @@ if (isset($_GET['lang'])) {
         set_language($requested);
     }
 
-    $path = strtok($_SERVER['REQUEST_URI'] ?? '/', '?') ?: '/';
-    $basePath = (string) config('app.base_path', '');
-    if ($basePath !== '' && str_starts_with($path, $basePath)) {
-        $path = substr($path, strlen($basePath));
-    }
-
-    parse_str((string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_QUERY), $query);
-    unset($query['lang']);
-
-    redirect(ltrim($path, '/') . ($query !== [] ? '?' . http_build_query($query) : ''));
+    unset($_GET['lang']);
 }
