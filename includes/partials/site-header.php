@@ -19,7 +19,7 @@ $location = restaurant('address');
 <header class="site-header">
   <div class="container header-inner">
     <a class="brand" href="<?= e(url('')) ?>">
-      <span class="brand-mark"><?= brand_mark_svg() ?></span>
+      <?= brand_logo_html() ?>
       <span class="brand-name">
         <span><?= e(restaurant_name()) ?></span>
         <?php if ($tagline !== '' && $tagline !== restaurant_name()): ?>

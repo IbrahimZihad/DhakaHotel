@@ -15,7 +15,7 @@ $year = (int) date('Y');
     <div class="footer-grid">
       <div>
         <a class="brand" href="<?= e(url('')) ?>">
-          <span class="brand-mark"><?= brand_mark_svg() ?></span>
+          <?= brand_logo_html() ?>
           <span class="brand-name"><span><?= e(restaurant_name()) ?></span></span>
         </a>
         <p style="margin-top:14px;max-width:34ch"><?= e(mb_substr(restaurant('description'), 0, 180)) ?></p>

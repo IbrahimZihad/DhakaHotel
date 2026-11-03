@@ -49,7 +49,7 @@ $siteName = restaurant_name();
 <body class="admin-body admin-login-body">
 <main class="login-card">
   <div class="login-brand">
-    <span class="brand-mark"><?= brand_mark_svg() ?></span>
+    <?= brand_logo_html() ?>
     <div>
       <h1><?= e(__('admin.login_title')) ?></h1>
       <p><?= e(__('admin.login_subtitle')) ?></p>

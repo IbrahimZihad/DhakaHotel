@@ -14,7 +14,7 @@ $topbarAdmin = admin_user();
   <?php endif; ?>
 
   <a class="brand" href="<?= e(url('admin/index.php')) ?>">
-    <span class="brand-mark"><?= brand_mark_svg() ?></span>
+    <?= brand_logo_html() ?>
     <span class="brand-name"><span><?= e(restaurant_name()) ?></span><small><?= e(__('admin.brand_owner')) ?></small></span>
   </a>
 

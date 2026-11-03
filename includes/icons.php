@@ -102,6 +102,20 @@ function brand_mark_svg(): string
         . '</svg>';
 }
 
+/**
+ * Brand logo used in headers and sidebars. Falls back to the drawn mark when
+ * assets/images/logo.webp is missing, so a fresh checkout still renders.
+ */
+function brand_logo_html(): string
+{
+    if (is_file(DH_ROOT . '/assets/images/logo.webp')) {
+        return '<img class="brand-logo" src="' . e(asset('assets/images/logo.webp')) . '"'
+            . ' width="640" height="427" alt="" loading="eager" decoding="async">';
+    }
+
+    return '<span class="brand-mark">' . brand_mark_svg() . '</span>';
+}
+
 function stars_html(float|int $rating, string $class = 'stars'): string
 {
     $full = max(0, min(5, (int) round($rating)));

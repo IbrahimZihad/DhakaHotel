@@ -442,6 +442,16 @@ html[lang="bn"] .eyebrow { text-transform: none; letter-spacing: 0; }
   box-shadow: 0 6px 14px rgba(244, 83, 125, 0.3);
 }
 .brand-mark svg { width: 24px; height: 24px; }
+/* The real logo is 3:2, so height drives its width inside the 64px header. */
+.brand-logo { height: 46px; width: auto; display: block; flex: none; }
+@media (min-width: 860px) { .brand-logo { height: 50px; } }
+/* The crest is black and gold, so on dark plates it needs its own light chip. */
+.site-footer .brand-logo {
+  height: 40px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 4px 8px;
+}
 .brand-name { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
 .brand-name small { font-size: 0.68rem; font-weight: 500; color: var(--ink-500); letter-spacing: 0.02em; }
 .brand-name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1720,6 +1730,8 @@ html[lang="bn"] .hero-copy h1 { line-height: 1.45; }
 .cart-count.is-bump { animation: cart-bump 0.5s var(--ease); }
 .brand-mark { transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease); }
 .brand:hover .brand-mark { transform: rotate(-8deg) scale(1.06); box-shadow: 0 10px 22px rgba(244, 83, 125, 0.4); }
+.brand-logo { transition: transform 0.35s var(--ease), filter 0.35s var(--ease); }
+.brand:hover .brand-logo { transform: scale(1.04); filter: drop-shadow(0 6px 14px rgba(42, 33, 36, 0.22)); }
 
 /* ---------- Footer ---------- */
 .site-footer { position: relative; }
