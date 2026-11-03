@@ -408,6 +408,8 @@ html[lang="bn"] .eyebrow { text-transform: none; letter-spacing: 0; }
 .brand-name { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
 .brand-name small { font-size: 0.68rem; font-weight: 500; color: var(--ink-500); letter-spacing: 0.02em; }
 .brand-name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.brand-loc { display: flex; align-items: center; gap: 4px; font-size: 0.64rem; min-width: 0; }
+.brand-loc svg { width: 11px; height: 11px; flex: none; }
 
 .main-nav {
   display: none;

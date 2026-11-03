@@ -1,6 +1,7 @@
 <?php
 /**
- * Menu item list with search, category filter, availability toggle and delete.
+ * Menu item list with search, category filter, inline price edit, availability
+ * toggle and delete.
  */
 
 declare(strict_types=1);
@@ -23,6 +24,16 @@ if (is_post()) {
         q('UPDATE menu_items SET is_available = ? WHERE id = ?', [(int) $item['is_available'] === 1 ? 0 : 1, $itemId]);
         audit_log('menu.toggle', 'menu_item', $itemId, ['is_available' => (int) $item['is_available'] === 1 ? 0 : 1]);
         flash('success', __('admin.item_updated'));
+    } elseif ($action === 'price') {
+        $priceCents = parse_money_input($_POST['price'] ?? '');
+        if ($priceCents === null) {
+            flash('error', __('admin.price_error'));
+        } else {
+            $newPrice = decimal_from_cents($priceCents);
+            q('UPDATE menu_items SET price = ? WHERE id = ?', [$newPrice, $itemId]);
+            audit_log('menu.price', 'menu_item', $itemId, ['price' => $newPrice]);
+            flash('success', __('admin.item_updated'));
+        }
     } elseif ($action === 'delete') {
         remove_upload($item['image_path']);
         q('DELETE FROM menu_items WHERE id = ?', [$itemId]);
@@ -136,7 +147,15 @@ require DH_ROOT . '/includes/partials/admin-head.php';
             </div>
           </td>
           <td data-label="<?= e(__('admin.category')) ?>"><?= e(localized(['name_bn' => $item['category_bn'], 'name_en' => $item['category_en']], 'name')) ?></td>
-          <td data-label="<?= e(__('admin.price')) ?>" class="num"><?= e(money_from_decimal((string) $item['price'])) ?></td>
+          <td data-label="<?= e(__('admin.price')) ?>" class="num">
+            <form class="input-group" method="post" action="<?= e(url('admin/menu.php')) ?>" style="justify-content:flex-end">
+              <?= csrf_field() ?>
+              <input type="hidden" name="action" value="price">
+              <input type="hidden" name="id" value="<?= (int) $item['id'] ?>">
+              <input class="input" type="text" name="price" value="<?= e((string) $item['price']) ?>" inputmode="decimal" maxlength="11" style="max-width:92px" aria-label="<?= e(__('admin.price')) ?>">
+              <button class="btn btn-secondary btn-sm" type="submit" title="<?= e(__('admin.save_changes')) ?>"><?= icon('check') ?></button>
+            </form>
+          </td>
           <td data-label="<?= e(__('admin.availability')) ?>">
             <form method="post" action="<?= e(url('admin/menu.php')) ?>">
               <?= csrf_field() ?>

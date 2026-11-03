@@ -14,6 +14,7 @@ $navItems = [
 $cartQty = cart_count();
 $waLink = whatsapp_link(__('nav.whatsapp'));
 $tagline = restaurant('tagline');
+$location = restaurant('address');
 ?>
 <header class="site-header">
   <div class="container header-inner">
@@ -23,6 +24,9 @@ $tagline = restaurant('tagline');
         <span><?= e(restaurant_name()) ?></span>
         <?php if ($tagline !== '' && $tagline !== restaurant_name()): ?>
         <small><?= e($tagline) ?></small>
+        <?php endif; ?>
+        <?php if ($location !== '' && $location !== $tagline): ?>
+        <small class="brand-loc"><?= icon('map-pin') ?><span><?= e($location) ?></span></small>
         <?php endif; ?>
       </span>
     </a>
