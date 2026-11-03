@@ -143,6 +143,7 @@ $billNoFee = compute_bill($lines, [
 
 $pageTitle = __('checkout.title');
 $activeNav = 'cart';
+$robots = 'noindex, follow';
 $bodyClass = 'has-sticky-bar';
 require DH_ROOT . '/includes/partials/site-head.php';
 require DH_ROOT . '/includes/partials/site-header.php';

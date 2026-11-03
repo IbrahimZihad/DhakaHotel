@@ -68,6 +68,7 @@ $timelineSteps = [
 
 $pageTitle = __('track.title');
 $activeNav = 'track';
+$robots = 'noindex, follow';
 require DH_ROOT . '/includes/partials/site-head.php';
 require DH_ROOT . '/includes/partials/site-header.php';
 require DH_ROOT . '/includes/partials/flash.php';

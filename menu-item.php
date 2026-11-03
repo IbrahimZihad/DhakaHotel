@@ -58,6 +58,21 @@ $related = fetch_all(
 
 $pageTitle = item_name($dish);
 $pageDescription = item_description($dish);
+$ogImage = menu_image_url($dish['image_path'] ?? null);
+// Scrapers will not render the SVG placeholder, so fall back to the share card.
+if (str_ends_with(strtolower($ogImage), '.svg')) {
+    $ogImage = 'assets/images/og-default.jpg';
+}
+$ogImageAlt = item_name($dish);
+$seo = [
+    'item' => $dish,
+    'breadcrumbs' => [
+        ['name' => __('nav.home'), 'path' => url('index.php')],
+        ['name' => __('nav.menu'), 'path' => url('menu.php')],
+        ['name' => localized($dish, 'category_name'), 'path' => url('menu.php') . '?category=' . urlencode((string) $dish['category_slug'])],
+        ['name' => item_name($dish), 'path' => url('menu-item.php?id=' . $itemId)],
+    ],
+];
 $activeNav = 'menu';
 $bodyClass = 'has-sticky-bar';
 require DH_ROOT . '/includes/partials/site-head.php';

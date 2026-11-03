@@ -64,6 +64,7 @@ $bodyClass = $empty ? '' : 'has-sticky-bar';
 
 $pageTitle = __('cart.title');
 $activeNav = 'cart';
+$robots = 'noindex, follow';
 require DH_ROOT . '/includes/partials/site-head.php';
 require DH_ROOT . '/includes/partials/site-header.php';
 require DH_ROOT . '/includes/partials/flash.php';

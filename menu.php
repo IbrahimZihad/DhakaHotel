@@ -85,6 +85,10 @@ $items = $total > 0 ? fetch_all(
 
 $pageTitle = __('menu.title');
 $pageDescription = __('menu.subtitle');
+// The Menu node describes the whole card, so it only belongs on the unfiltered
+// first page; a search or category result would contradict its own markup.
+$isBrowsedMenu = $search === '' && $activeCategory === null && $sort === 'default' && $pageData['page'] === 1;
+$seo = $isBrowsedMenu ? ['menu' => true] : [];
 $activeNav = 'menu';
 require DH_ROOT . '/includes/partials/site-head.php';
 require DH_ROOT . '/includes/partials/site-header.php';

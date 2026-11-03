@@ -19,6 +19,7 @@ require DH_ROOT . '/includes/database_helpers.php';
 require DH_ROOT . '/includes/validation.php';
 require DH_ROOT . '/includes/csrf.php';
 require DH_ROOT . '/includes/language.php';
+require DH_ROOT . '/includes/seo.php';
 require DH_ROOT . '/includes/auth.php';
 require DH_ROOT . '/includes/billing.php';
 require DH_ROOT . '/includes/cart.php';
