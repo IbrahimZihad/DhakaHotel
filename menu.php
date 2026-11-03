@@ -108,9 +108,10 @@ if ($activeCategory !== null) {
     $pageDescription = __('menu.category_meta_description', $categoryParams);
 }
 if ($pageData['page'] > 1) {
-    $titleTag .= ' · ' . __('menu.page_number', [
-        'page' => is_bn() ? bn_digits((string) $pageData['page']) : (string) $pageData['page'],
-    ]);
+    $pageNumber = is_bn() ? bn_digits((string) $pageData['page']) : (string) $pageData['page'];
+    $pageSuffix = __('menu.page_number', ['page' => $pageNumber]);
+    $titleTag .= ' · ' . $pageSuffix;
+    $pageDescription .= ' — ' . $pageSuffix;
 }
 $activeNav = 'menu';
 require DH_ROOT . '/includes/partials/site-head.php';

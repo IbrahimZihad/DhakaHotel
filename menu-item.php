@@ -40,17 +40,18 @@ $related = fetch_all(
 );
 
 $pageTitle = item_name($dish);
-$pageDescription = item_description($dish);
-if ($pageDescription === '') {
-    // Dishes without a write-up still need a description, otherwise Google
-    // composes one from page noise. This one states only what the page shows.
-    $pageDescription = __('dish.meta_description', [
-        'dish' => item_name($dish),
-        'category' => localized($dish, 'category_name'),
-        'price' => money_from_decimal((string) $dish['price']),
-        'restaurant' => restaurant_name(),
-    ]);
-}
+// Most dishes have no write-up yet. Either way the description states only what
+// the page shows and names the dish, so no two pages can share one snippet.
+$dishFacts = [
+    'dish' => item_name($dish),
+    'category' => localized($dish, 'category_name'),
+    'price' => money_from_decimal((string) $dish['price']),
+    'restaurant' => restaurant_name(),
+];
+$writeUp = item_description($dish);
+$pageDescription = $writeUp === ''
+    ? __('dish.meta_description', $dishFacts)
+    : $writeUp . ' — ' . __('dish.meta_facts', $dishFacts);
 $ogImage = menu_image_url($dish['image_path'] ?? null);
 // Scrapers will not render the SVG placeholder, so fall back to the share card.
 if (str_ends_with(strtolower($ogImage), '.svg')) {

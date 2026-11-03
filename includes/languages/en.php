@@ -136,7 +136,7 @@ return [
     'menu.title' => 'Our menu',
     'menu.subtitle' => 'Live prices and availability, straight from the kitchen.',
     'menu.meta_description' => 'The full {restaurant} menu with live prices: kabab, paratha, biryani, meat, fish, bhorta, curries and desserts. Delivered across Purbachal, Dhaka.',
-    'menu.title_tag' => 'Menu — Kabab, Biryani, Bread & Desserts · {restaurant}',
+    'menu.title_tag' => 'Menu — Kabab, Biryani & Bread · {restaurant}',
     'menu.category_title_tag' => '{category} — {restaurant}, Purbachal',
     'menu.category_meta_description' => '{count} {category} dishes at {restaurant}, with live prices, cooked to order and delivered across Purbachal, Dhaka.',
     'menu.page_number' => 'page {page}',
@@ -163,6 +163,7 @@ return [
     'dish.back_to_menu' => 'Back to menu',
     'dish.not_found' => 'That dish could not be found.',
     'dish.meta_description' => '{dish} from the {category} section at {restaurant} in Purbachal. Price {price}, cooked to order and delivered hot. Order online or call.',
+    'dish.meta_facts' => '{dish} · {category} · {price} at {restaurant}, Purbachal',
     'dish.category' => 'Category',
     'dish.about' => 'About this dish',
 
