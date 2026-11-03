@@ -202,7 +202,7 @@ function remove_upload(?string $relativePath): void
     $path = realpath(DH_ROOT . '/uploads/' . ltrim($relativePath, '/'));
     $root = realpath(DH_ROOT . '/uploads');
 
-    if ($path !== false && $root !== false && str_starts_with($path, $root) && is_file($path)) {
+    if ($path !== false && $root !== false && str_starts_with($path, $root . DIRECTORY_SEPARATOR) && is_file($path)) {
         @unlink($path);
     }
 }

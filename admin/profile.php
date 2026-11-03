@@ -62,7 +62,13 @@ if (is_post()) {
         }
 
         if ($errors === []) {
-            q('UPDATE admins SET password_hash = ? WHERE id = ?', [password_hash($newPassword, PASSWORD_DEFAULT), (int) $admin['id']]);
+            $nextVersion = (int) $admin['auth_version'] + 1;
+            q('UPDATE admins SET password_hash = ?, auth_version = ? WHERE id = ?', [
+                password_hash($newPassword, PASSWORD_DEFAULT),
+                $nextVersion,
+                (int) $admin['id'],
+            ]);
+            $_SESSION['admin_auth_version'] = $nextVersion;
             audit_log('admin.password_changed', 'admin', (int) $admin['id']);
             flash('success', __('admin.password_updated'));
             redirect('admin/profile.php');

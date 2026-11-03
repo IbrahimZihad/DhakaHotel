@@ -8,6 +8,14 @@ declare(strict_types=1);
 const ADMIN_LOGIN_MAX_FAILURES = 5;
 const ADMIN_LOGIN_WINDOW_MINUTES = 15;
 
+/**
+ * Hash of a throwaway secret, verified when no admin row matches so a missing
+ * account costs the same CPU as a wrong password and cannot be listed. Its cost
+ * has to track PASSWORD_DEFAULT, which is what every stored hash is rehashed to
+ * on login (see attempt_admin_login).
+ */
+const ADMIN_TIMING_HASH = '$2y$12$1FdT8GKicLduvNOaQz0C4OoJIbTegyxHqfA2BuWrs7fTchGnRJqCy';
+
 function admin_user(): ?array
 {
     static $cached = false;
@@ -22,12 +30,17 @@ function admin_user(): ?array
     }
 
     $admin = fetch_one(
-        'SELECT id, name, email, preferred_language, is_active, last_login_at FROM admins WHERE id = ? AND is_active = 1',
+        'SELECT id, name, email, preferred_language, is_active, last_login_at, auth_version
+         FROM admins WHERE id = ? AND is_active = 1',
         [$id]
     );
 
-    if ($admin === null) {
+    // A password change raises auth_version, so sessions minted before it stop
+    // authenticating while the one that made the change survives.
+    if ($admin === null || (int) ($_SESSION['admin_auth_version'] ?? 1) !== (int) $admin['auth_version']) {
         unset($_SESSION['admin_id']);
+
+        return $cached = null;
     }
 
     return $cached = $admin;
@@ -96,7 +109,8 @@ function attempt_admin_login(string $email, string $password, string $ip): array
     }
 
     $admin = fetch_one('SELECT * FROM admins WHERE email = ? AND is_active = 1', [$email]);
-    $valid = $admin !== null && password_verify($password, (string) $admin['password_hash']);
+    $valid = password_verify($password, $admin !== null ? (string) $admin['password_hash'] : ADMIN_TIMING_HASH)
+        && $admin !== null;
 
     if (!$valid) {
         log_login_attempt($email, $ip, false);
@@ -111,6 +125,7 @@ function attempt_admin_login(string $email, string $password, string $ip): array
     session_regenerate_id(true);
 
     $_SESSION['admin_id'] = (int) $admin['id'];
+    $_SESSION['admin_auth_version'] = (int) ($admin['auth_version'] ?? 1);
     $_SESSION['admin_lang'] = in_array($admin['preferred_language'], ['bn', 'en'], true)
         ? $admin['preferred_language']
         : 'bn';

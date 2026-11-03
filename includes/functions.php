@@ -57,8 +57,58 @@ function asset(string $path): string
 }
 
 /**
+ * Host name safe to publish in an absolute URL.
+ *
+ * The Host header is attacker-controlled: an unvalidated copy leaked into the
+ * sitemap, canonical, og:url and the PATH_INFO redirect, so a single poisoned
+ * request could make the site advertise a domain the owner does not hold.
+ * TRUSTED_HOSTS turns this into an allowlist; with no list the header still
+ * has to parse as a bare hostname with an optional port, or it is discarded.
+ */
+function request_host(): string
+{
+    $allowlist = (array) config('app.trusted_hosts', []);
+    $trusted = [];
+    foreach ($allowlist as $entry) {
+        $normalized = normalize_host((string) $entry);
+        if ($normalized !== '') {
+            $trusted[] = $normalized;
+        }
+    }
+
+    $requested = normalize_host((string) ($_SERVER['HTTP_HOST'] ?? ''));
+
+    if ($trusted !== []) {
+        return in_array($requested, $trusted, true) ? $requested : $trusted[0];
+    }
+
+    if ($requested !== '') {
+        return $requested;
+    }
+
+    return normalize_host((string) ($_SERVER['SERVER_NAME'] ?? ''));
+}
+
+/**
+ * Lowercased host[:port], or '' for anything that is not exactly that.
+ */
+function normalize_host(string $value): string
+{
+    $value = strtolower(trim($value));
+    $value = (string) preg_replace('#^[a-z][a-z0-9+.\-]*://#', '', $value);
+    $value = (string) preg_replace('#[/?\#].*$#', '', $value);
+
+    if (strlen($value) > 253 || str_contains($value, '..')) {
+        return '';
+    }
+
+    return preg_match('#^[a-z0-9][a-z0-9.\-]*(?::\d{1,5})?$#', $value) === 1 ? $value : '';
+}
+
+/**
  * Scheme + host for social crawlers, which cannot read a relative URL.
- * APP_URL wins; without it the request host is used, so local XAMPP works.
+ * APP_URL wins; without it the validated request host is used, so local XAMPP
+ * works while a spoofed header can no longer rewrite the published origin.
  */
 function site_origin(): string
 {
@@ -67,9 +117,9 @@ function site_origin(): string
         return $configured;
     }
 
-    $host = (string) ($_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost');
+    $host = request_host();
 
-    return (is_https() ? 'https://' : 'http://') . $host;
+    return (is_https() ? 'https://' : 'http://') . ($host === '' ? 'localhost' : $host);
 }
 
 function absolute_url(string $path = ''): string
@@ -154,7 +204,7 @@ function safe_admin_next(?string $candidate): string
         $path = substr($path, strlen($basePath));
     }
 
-    if (!str_starts_with($path, '/admin/') || str_contains($path, '//')) {
+    if (!str_starts_with($path, '/admin/') || str_contains($path, '//') || preg_match('#(^|/)\.\.(/|$)#', $path) === 1) {
         return 'admin/index.php';
     }
 

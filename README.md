@@ -12,7 +12,7 @@ Plain **PHP 8.2+ / MySQL 8 (or MariaDB) / HTML / CSS / vanilla JavaScript**. PDO
 - **Receipts** — 58 mm, 80 mm and A4 layouts, independent receipt language, never changes payment state.
 - **Bilingual** — every string comes from `includes/languages/bn.php` / `en.php`; Bangla is the default; admin language is independent from the public language.
 - **PWA** — manifest, service worker with a public-pages-only cache, offline page, install instructions and real PNG icons.
-- **Security** — CSRF tokens on every write, escaping on output, prepared statements, upload content inspection, CSP and other headers, secrets only in `.env`.
+- **Security** — CSRF tokens on every write, escaping on output, prepared statements, upload content inspection, CSP and other headers, secrets only in `.env`, login lockout that costs the same for an unknown address, password changes that revoke every other admin session, and absolute URLs built only from `APP_URL`/`TRUSTED_HOSTS` so a spoofed `Host` header cannot reach the sitemap or social tags.
 
 ## Requirements
 
@@ -67,6 +67,12 @@ Password: DhakaDemo@2026!
 ```
 
 The demo content (menu, reviews, sample orders) is fictional and labelled as demo in the UI.
+
+Five wrong passwords in a fifteen-minute window lock both that address and the requesting IP: the sixth attempt is refused before the credentials are read, so the real password is rejected too. The window expires on its own; clearing it early is a database edit:
+
+```sql
+DELETE FROM admin_login_attempts WHERE success = 0;
+```
 
 ## Useful CLI commands
 
@@ -141,10 +147,13 @@ php -l admin\api\pos.php
 ## Deployment checklist
 
 - [ ] `APP_ENV=production`, `APP_DEBUG=false`, `APP_DEMO_MODE=false`
+- [ ] `APP_URL` set to the public origin, or `TRUSTED_HOSTS` listing every real hostname; an unlisted `Host` header then cannot reach the sitemap, canonical or social tags
 - [ ] `DB_*` and `MAIL_*` set in `.env`; `.env` never committed or served
+- [ ] `.git/` not deployed (`.htaccess` denies dot-paths, but a repository folder should not be in the document root at all)
 - [ ] `APP_BASE_PATH` matches the deployment path; `APP_ASSET_VERSION` bumped
 - [ ] HTTPS enabled and `SESSION_SECURE=true`
 - [ ] `.htaccess` honoured (`AllowOverride All`) or equivalent server rules applied
+- [ ] `ServerTokens Prod` and `ServerSignature Off` in the server config, if you can edit it - the bundled `.htaccess` already removes `X-Powered-By` and the directory listings
 - [ ] `vendor/` installed (`composer install --no-dev --optimize-autoloader`) if email is used
 - [ ] Migrations applied; demo data not seeded on production
 - [ ] Writable `uploads/menu/` and `storage/` for the web user

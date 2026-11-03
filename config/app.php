@@ -7,6 +7,10 @@ return [
     'debug' => (bool) env('APP_DEBUG', true),
     'base_path' => rtrim((string) env('APP_BASE_PATH', ''), '/'),
     'url' => rtrim((string) env('APP_URL', ''), '/'),
+    'trusted_hosts' => array_values(array_filter(
+        array_map('trim', explode(',', (string) env('TRUSTED_HOSTS', ''))),
+        static fn (string $host): bool => $host !== ''
+    )),
     'timezone' => (string) env('APP_TIMEZONE', 'Asia/Dhaka'),
     'demo_mode' => (bool) env('APP_DEMO_MODE', true),
     'default_lang' => 'bn',

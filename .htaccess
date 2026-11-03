@@ -3,6 +3,11 @@
 
 DirectoryIndex index.php
 
+# A directory listing is a file enumerator: it published .git and would publish
+# any future backup or scratch folder left in the web root.
+Options -Indexes
+ServerSignature Off
+
 <IfModule mod_mime.c>
   AddType application/manifest+json .webmanifest
   AddType image/svg+xml .svg
@@ -12,7 +17,17 @@ DirectoryIndex index.php
   RewriteEngine On
 
   # Source, tooling and runtime folders are never served directly.
-  RewriteRule ^(config|database|includes|tests|vendor|storage|tools)(/|$) - [F,L]
+  RewriteRule ^(config|database|includes|tests|vendor|storage|tools|scripts)(/|$) - [F,L]
+
+  # Dot-prefixed path segments (.git/, .env.local, editor backups) are denied on
+  # the request path, not only by filename: the repository folder sat under the
+  # document root and served .git/config, which is full source disclosure.
+  # REQUEST_URI is checked before the filesystem, so nested paths are covered.
+  # /.well-known/ stays reachable - certificate authority HTTP-01 challenges
+  # need it, and blocking it would break the future HTTPS switch below.
+  RewriteCond %{REQUEST_URI} !/\.well-known(/|$)
+  RewriteCond %{REQUEST_URI} (?:^|/)\.
+  RewriteRule ^ - [F,L]
 
   # Crawler files mirror live settings, so they are generated on request rather
   # than committed with paths that go stale.
@@ -26,12 +41,19 @@ DirectoryIndex index.php
 </IfModule>
 
 <IfModule mod_authz_core.c>
+  <FilesMatch "^\.">
+    Require all denied
+  </FilesMatch>
   <FilesMatch "^\.env$|^\.env\..*|^composer\.(json|lock)$|\.(sql|log|md)$">
     Require all denied
   </FilesMatch>
 </IfModule>
 
 <IfModule mod_headers.c>
+  # "What is running here" is the first thing an uninvited visitor asks. The
+  # Apache banner itself needs ServerTokens in the server config; see README.
+  Header unset X-Powered-By
+
   <FilesMatch "\.(css|js|png|jpe?g|webp|svg|woff2)$">
     Header set Cache-Control "public, max-age=86400"
   </FilesMatch>
