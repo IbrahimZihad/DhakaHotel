@@ -183,11 +183,18 @@ function seo_website_id(): string
     return rtrim(absolute_url(''), '/') . '/#website';
 }
 
-function seo_restaurant_node(): array
+/** The restaurant's name in the language the page is not written in. */
+function seo_alternate_name(): ?string
 {
     $otherLang = current_lang() === 'bn' ? 'en' : 'bn';
-    $name = restaurant_name();
     $alternate = trim(restaurant('name', $otherLang));
+
+    return $alternate !== '' && $alternate !== restaurant_name() ? $alternate : null;
+}
+
+function seo_restaurant_node(): array
+{
+    $name = restaurant_name();
     // Mirror the address the visitor can see, so the markup never claims more
     // than the page shows.
     $street = trim(restaurant('address'));
@@ -210,12 +217,9 @@ function seo_restaurant_node(): array
         'servesCuisine' => ['Bangladeshi'],
         'priceRange' => seo_price_range(),
         'hasMenu' => seo_asset_url(url('menu.php')),
+        'alternateName' => seo_alternate_name(),
         'inLanguage' => array_values(available_languages()),
     ];
-
-    if ($alternate !== '' && $alternate !== $name) {
-        $node['alternateName'] = $alternate;
-    }
 
     $phones = array_filter([
         seo_phone((string) setting('phone', '')),
@@ -251,13 +255,12 @@ function seo_restaurant_node(): array
 
 function seo_website_node(): array
 {
-    return [
+    $node = [
         '@type' => 'WebSite',
         '@id' => seo_website_id(),
         'url' => rtrim(absolute_url(''), '/') . '/',
         'name' => restaurant_name(),
-        'alternateName' => seo_restaurant_node()['alternateName'] ?? null,
-        'description' => trim(strip_tags(restaurant('description'))),
+        'alternateName' => seo_alternate_name(),
         'inLanguage' => array_values(available_languages()),
         'publisher' => ['@id' => seo_restaurant_id()],
         'potentialAction' => [[
@@ -269,13 +272,15 @@ function seo_website_node(): array
             'query-input' => 'required name=search_term_string',
         ]],
     ];
+
+    return array_filter($node, static fn (mixed $v): bool => $v !== '' && $v !== [] && $v !== null);
 }
 
 /** Trail of ['name' => .., 'path' => ..]; the last entry is the current page. */
 function seo_breadcrumb_node(array $trail): array
 {
     $items = [];
-    foreach (array_values($trail) as $index => $crumb) {
+    foreach (array_values($trail) as $crumb) {
         $name = trim((string) ($crumb['name'] ?? ''));
         if ($name === '') {
             continue;

@@ -37,8 +37,9 @@ if ($basePath !== '' && str_starts_with($canonicalPath, $basePath)) {
 }
 // /index.php and / serve the same page, so the directory form is the canonical
 // one and the two URLs cannot be indexed as duplicates.
-if (strtolower(basename($canonicalPath)) === 'index.php') {
-    $canonicalPath = rtrim(substr($canonicalPath, 0, -strlen('index.php')), '/') . '/';
+$canonicalPath = (string) preg_replace('#(^|/)index\.php/?$#', '$1', $canonicalPath);
+if ($canonicalPath === '') {
+    $canonicalPath = '/';
 }
 $canonicalQuery = $_GET;
 unset($canonicalQuery['lang']);

@@ -53,6 +53,18 @@ if ($debug) {
     });
 }
 
+/*
+ * No entry point reads path info, so /menu.php/anything serves the same page
+ * under a second URL. Fold it back onto the script before anything is output.
+ */
+if (!empty($_SERVER['PATH_INFO'])) {
+    $forwardQuery = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_QUERY);
+    redirect(
+        site_origin() . (string) ($_SERVER['SCRIPT_NAME'] ?? '') . ($forwardQuery !== '' ? '?' . $forwardQuery : ''),
+        301
+    );
+}
+
 if ($isCli || defined('DH_MACHINE_READABLE')) {
     return;
 }
