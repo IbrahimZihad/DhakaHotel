@@ -77,6 +77,15 @@ if (is_post()) {
     if ($action === 'refund') {
         $paymentId = (int) ($_POST['payment_id'] ?? 0);
         $reason = clean_text($_POST['refund_reason'] ?? '', 255);
+
+        // The posted payment_id must belong to this order, or a stale form from
+        // another order would refund the wrong bill.
+        $paymentRow = fetch_one('SELECT order_id FROM payments WHERE id = ?', [$paymentId]);
+        if ($paymentRow === null || (int) $paymentRow['order_id'] !== $orderId) {
+            flash('error', __('admin.refund_failed'));
+            redirect('admin/order-details.php?id=' . $orderId);
+        }
+
         $result = refund_payment($paymentId, admin_id(), $reason);
         flash($result['ok'] ? 'success' : 'error', $result['ok'] ? __('admin.refund_recorded') : __('admin.refund_failed'));
         redirect('admin/order-details.php?id=' . $orderId);

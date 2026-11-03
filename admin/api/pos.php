@@ -53,7 +53,7 @@ $discountRaw = trim((string) ($body['discount'] ?? ''));
 if ($discountRaw !== '' && $discountRaw !== '0') {
     $parsed = parse_money_input($discountRaw);
     if ($parsed === null || $parsed > $subtotal) {
-        json_response(['ok' => false, 'message' => __('pos.error_amount')], 422);
+        json_response(['ok' => false, 'message' => __('pos.error_discount')], 422);
     }
     $discount = $parsed;
 }
@@ -275,9 +275,10 @@ if ($action === 'complete_payment') {
         ], 422);
     }
 
-    $charge = in_array($method, ['bkash', 'nagad', 'card', 'other'], true)
-        ? (int) $totals['grand_total']
-        : min($received, (int) $totals['grand_total']);
+    // Record only what was actually taken. Digital methods used to book the
+    // whole grand_total whatever the cashier entered, which overstated paid
+    // revenue. An empty amount_received still means "the full bill".
+    $charge = min($received, (int) $totals['grand_total']);
 
     $payment = record_payment($orderId, [
         'method' => $method !== '' ? $method : 'cash',

@@ -3,6 +3,7 @@
  * Public site footer.
  */
 $phone = trim((string) setting('phone', ''));
+$phone2 = trim((string) setting('phone2', ''));
 $email = trim((string) setting('owner_email', ''));
 $address = restaurant('address');
 $hours = restaurant('hours');
@@ -41,6 +42,9 @@ $year = (int) date('Y');
           <li><?= icon('phone') ?><a href="tel:<?= e(preg_replace('/[^0-9+]/', '', $phone)) ?>"><?= e($phone) ?></a></li>
           <?php else: ?>
           <li><?= icon('phone') ?><span><?= e(__('contact.no_phone')) ?></span></li>
+          <?php endif; ?>
+          <?php if ($phone2 !== ''): ?>
+          <li><?= icon('phone') ?><a href="tel:<?= e(preg_replace('/[^0-9+]/', '', $phone2)) ?>"><?= e($phone2) ?></a></li>
           <?php endif; ?>
           <?php if ($waLink !== null): ?>
           <li><?= icon('whatsapp') ?><a href="<?= e($waLink) ?>" target="_blank" rel="noopener"><?= e(__('contact.whatsapp')) ?></a></li>

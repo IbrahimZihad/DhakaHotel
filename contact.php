@@ -8,6 +8,7 @@ declare(strict_types=1);
 require __DIR__ . '/includes/bootstrap.php';
 
 $phone = trim((string) setting('phone', ''));
+$phone2 = trim((string) setting('phone2', ''));
 $email = trim((string) setting('owner_email', ''));
 $address = restaurant('address');
 $hours = restaurant('hours');
@@ -41,6 +42,9 @@ require DH_ROOT . '/includes/partials/flash.php';
               <a href="tel:<?= e(preg_replace('/[^0-9+]/', '', $phone)) ?>"><?= e($phone) ?></a>
               <?php else: ?>
               <span><?= e(__('contact.no_phone')) ?></span>
+              <?php endif; ?>
+              <?php if ($phone2 !== ''): ?>
+              <br><a href="tel:<?= e(preg_replace('/[^0-9+]/', '', $phone2)) ?>"><?= e($phone2) ?></a>
               <?php endif; ?>
             </div>
           </li>

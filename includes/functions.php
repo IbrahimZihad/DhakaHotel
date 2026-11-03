@@ -101,7 +101,9 @@ function redirect(string $path, int $code = 302): never
 
 /**
  * Only allow redirects inside the admin area, so `?next=` can never be used to
- * bounce users to another host.
+ * bounce users to another host. REQUEST_URI carries the app's base path, which
+ * has to come off before the /admin/ prefix test; the query string is kept so
+ * filters and receipt paper sizes survive the login round-trip.
  */
 function safe_admin_next(?string $candidate): string
 {
@@ -110,11 +112,23 @@ function safe_admin_next(?string $candidate): string
     }
 
     $path = parse_url($candidate, PHP_URL_PATH);
-    if (!is_string($path) || !str_starts_with($path, '/admin/') || str_contains($path, '//')) {
+    $query = parse_url($candidate, PHP_URL_QUERY);
+    if (!is_string($path)) {
         return 'admin/index.php';
     }
 
-    return ltrim($path, '/');
+    $basePath = rtrim((string) config('app.base_path', ''), '/');
+    if ($basePath !== '' && str_starts_with($path, $basePath)) {
+        $path = substr($path, strlen($basePath));
+    }
+
+    if (!str_starts_with($path, '/admin/') || str_contains($path, '//')) {
+        return 'admin/index.php';
+    }
+
+    $relative = ltrim($path, '/');
+
+    return is_string($query) && $query !== '' ? $relative . '?' . $query : $relative;
 }
 
 function is_post(): bool

@@ -7,7 +7,8 @@ declare(strict_types=1);
 
 require __DIR__ . '/includes/bootstrap.php';
 
-$pageTitle = __('pwa.install_title');
+$installTitle = __('pwa.install_title', ['name' => restaurant_name()]);
+$pageTitle = $installTitle;
 $pageDescription = __('pwa.install_text');
 $activeNav = '';
 require DH_ROOT . '/includes/partials/site-head.php';
@@ -17,7 +18,7 @@ require DH_ROOT . '/includes/partials/site-header.php';
   <div class="page-head">
     <div class="container">
       <span class="eyebrow"><?= icon('download') ?><?= e(__('pwa.install')) ?></span>
-      <h1><?= e(__('pwa.install_title')) ?></h1>
+      <h1><?= e($installTitle) ?></h1>
       <p><?= e(__('pwa.install_text')) ?></p>
     </div>
   </div>
@@ -46,7 +47,7 @@ require DH_ROOT . '/includes/partials/site-header.php';
 
       <aside class="checkout-aside">
         <div class="card card-pad">
-          <h2 style="font-size:var(--fs-lg);margin-bottom:10px"><?= e(__('pwa.install_title')) ?></h2>
+          <h2 style="font-size:var(--fs-lg);margin-bottom:10px"><?= e($installTitle) ?></h2>
           <p class="small muted"><?= e(__('pwa.not_supported')) ?></p>
           <button class="btn btn-block" type="button" data-install-pwa data-install-page="<?= e(url('install.php')) ?>" style="margin-top:14px">
             <?= icon('download') ?><span><?= e(__('pwa.install_now')) ?></span>

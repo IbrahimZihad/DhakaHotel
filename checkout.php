@@ -45,10 +45,13 @@ $bill = compute_bill($lines, ['delivery_fee_cents' => 0]);
 if (is_post()) {
     require_csrf();
 
-    $form['customer_name'] = clean_text($_POST['customer_name'] ?? '', 80);
+    $rawName = $_POST['customer_name'] ?? '';
+    $rawAddress = $_POST['delivery_address'] ?? '';
+
+    $form['customer_name'] = clean_text($rawName, 80);
     $form['customer_phone'] = clean_text($_POST['customer_phone'] ?? '', 20);
     $form['customer_email'] = clean_text($_POST['customer_email'] ?? '', 120);
-    $form['delivery_address'] = clean_text($_POST['delivery_address'] ?? '', 300);
+    $form['delivery_address'] = clean_text($rawAddress, 300);
     $form['notes'] = clean_text($_POST['notes'] ?? '', 500);
     $form['delivery_method'] = (string) ($_POST['delivery_method'] ?? 'delivery');
     $form['payment_method'] = (string) ($_POST['payment_method'] ?? 'cod');
@@ -69,7 +72,7 @@ if (is_post()) {
         $errors['items'] = __('checkout.error_items');
     }
 
-    if (!v_min_length($form['customer_name'], 2) || !v_max_length($form['customer_name'], 80)) {
+    if (!v_min_length($form['customer_name'], 2) || !v_raw_max_length($rawName, 80)) {
         $errors['customer_name'] = __('checkout.error_name');
     }
     if (!is_valid_bd_phone($form['customer_phone'])) {
@@ -78,7 +81,7 @@ if (is_post()) {
     if ($form['customer_email'] !== '' && !v_email($form['customer_email'])) {
         $errors['customer_email'] = __('checkout.error_email');
     }
-    if ($deliveryMethod === 'delivery' && (!v_min_length($form['delivery_address'], 10) || !v_max_length($form['delivery_address'], 300))) {
+    if ($deliveryMethod === 'delivery' && (!v_min_length($form['delivery_address'], 10) || !v_raw_max_length($rawAddress, 300))) {
         $errors['delivery_address'] = __('checkout.error_address');
     }
 
@@ -125,6 +128,18 @@ if (is_post()) {
         'tax_basis_points' => tax_rate_basis_points(),
     ]);
 }
+
+/* Both totals are rendered up front so switching between delivery and pickup
+   updates the money without a reload; app.js toggles which one is visible.
+   Formatting stays server-side so the Bangla numerals remain correct. */
+$billWithFee = compute_bill($lines, [
+    'delivery_fee_cents' => delivery_fee_cents(),
+    'tax_basis_points' => tax_rate_basis_points(),
+]);
+$billNoFee = compute_bill($lines, [
+    'delivery_fee_cents' => 0,
+    'tax_basis_points' => tax_rate_basis_points(),
+]);
 
 $pageTitle = __('checkout.title');
 $activeNav = 'cart';
@@ -261,11 +276,12 @@ require DH_ROOT . '/includes/partials/flash.php';
 
             <ul class="summary-list">
               <li><span><?= e(__('common.subtotal')) ?></span><span><?= money($bill['subtotal']) ?></span></li>
-              <li><span><?= e(__('common.delivery_fee')) ?></span><span><?= money($bill['delivery_fee']) ?></span></li>
+              <li data-checkout="fee"<?= $deliveryMethod === 'pickup' ? ' hidden' : '' ?>><span><?= e(__('common.delivery_fee')) ?></span><span><?= money($billWithFee['delivery_fee']) ?></span></li>
               <?php if ($bill['tax'] > 0): ?>
               <li><span><?= e(__('common.tax')) ?></span><span><?= money($bill['tax']) ?></span></li>
               <?php endif; ?>
-              <li class="total"><span><?= e(__('common.total')) ?></span><span><?= money($bill['grand_total']) ?></span></li>
+              <li class="total" data-checkout="total-delivery"<?= $deliveryMethod === 'pickup' ? ' hidden' : '' ?>><span><?= e(__('common.total')) ?></span><span><?= money($billWithFee['grand_total']) ?></span></li>
+              <li class="total" data-checkout="total-pickup"<?= $deliveryMethod === 'pickup' ? '' : ' hidden' ?>><span><?= e(__('common.total')) ?></span><span><?= money($billNoFee['grand_total']) ?></span></li>
             </ul>
 
             <button class="btn btn-lg btn-block checkout-submit-desktop" type="submit" style="margin-top:16px" id="place-order-btn">
@@ -281,7 +297,8 @@ require DH_ROOT . '/includes/partials/flash.php';
     <div class="sticky-bar">
       <div class="sticky-total">
         <span><?= e(__('common.total')) ?></span>
-        <b class="price"><?= money($bill['grand_total']) ?></b>
+        <b class="price" data-checkout="sticky-delivery"<?= $deliveryMethod === 'pickup' ? ' hidden' : '' ?>><?= money($billWithFee['grand_total']) ?></b>
+        <b class="price" data-checkout="sticky-pickup"<?= $deliveryMethod === 'pickup' ? '' : ' hidden' ?>><?= money($billNoFee['grand_total']) ?></b>
       </div>
       <button class="btn btn-lg" type="submit" form="checkout-form">
         <?= icon('check') ?><span><?= e(__('checkout.place_order')) ?></span>

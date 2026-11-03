@@ -103,6 +103,7 @@ $posConfig = [
     'messages' => [
         'empty' => __('pos.error_empty'),
         'amount' => __('pos.error_amount'),
+        'discount' => __('pos.error_discount'),
         'reference' => __('pos.error_reference'),
         'generic' => __('pos.error_generic'),
         'csrf' => __('pos.error_csrf'),

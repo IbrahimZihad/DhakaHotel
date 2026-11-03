@@ -41,10 +41,12 @@ function require_csrf(): void
     }
 
     if (request_wants_json()) {
-        json_response(['ok' => false, 'error' => 'csrf'], 419);
+        json_response(['ok' => false, 'error' => 'csrf'], 403);
     }
 
-    http_response_code(419);
+    // 403, not a bespoke 419: Apache has no reason phrase for 419 and rewrites
+    // the whole response to 500, which hides CSRF rejections as server errors.
+    http_response_code(403);
     echo '<!doctype html><meta charset="utf-8"><p style="font-family:system-ui;padding:24px">'
         . e(__('error.session_expired')) . '</p>';
     exit;

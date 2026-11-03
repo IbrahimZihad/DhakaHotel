@@ -47,6 +47,23 @@ require DH_ROOT . '/includes/partials/flash.php';
       <img src="<?= e(asset('assets/images/menu/kacchi-biryani.svg')) ?>" alt="<?= e(__('home.hero_image_alt')) ?>" width="1200" height="900" loading="lazy">
     </div>
 
+    <?php $ownerName = restaurant('owner_name'); ?>
+    <?php if ($ownerName !== ''): ?>
+    <div class="card card-pad" style="margin-top:32px">
+      <h2 style="font-size:var(--fs-lg);margin-bottom:16px"><?= e(__('about.owner_title')) ?></h2>
+      <div style="display:flex;gap:16px;align-items:flex-start">
+        <span class="avatar" style="width:54px;height:54px;font-size:var(--fs-lg);flex:none"><?= e(mb_strtoupper(mb_substr($ownerName, 0, 1, 'UTF-8'), 'UTF-8')) ?></span>
+        <div>
+          <strong style="font-size:var(--fs-md)"><?= e($ownerName) ?></strong>
+          <?php $ownerBio = restaurant('owner_bio'); ?>
+          <?php if ($ownerBio !== ''): ?>
+          <p class="muted" style="margin-top:8px"><?= nl2br(e($ownerBio)) ?></p>
+          <?php endif; ?>
+        </div>
+      </div>
+    </div>
+    <?php endif; ?>
+
     <div class="grid-2" style="display:grid;gap:18px;margin-top:32px">
       <div class="card card-pad">
         <h2 style="font-size:var(--fs-lg);margin-bottom:10px"><?= e(__('about.hours_title')) ?></h2>

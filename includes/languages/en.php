@@ -96,7 +96,7 @@ return [
 
     // Home -----------------------------------------------------------------
     'home.hero_eyebrow' => 'Fresh from our kitchen',
-    'home.hero_title' => 'Warm biryani, delivered to your door',
+    'home.hero_title' => 'Charcoal-grilled kabab, delivered hot',
     'home.hero_text' => 'Home-style Bangladeshi food cooked in small batches and sent out hot. Order in Bangla or English — whichever feels like home.',
     'home.hero_cta_menu' => 'Browse the menu',
     'home.hero_cta_order' => 'Start an order',
@@ -244,7 +244,7 @@ return [
     'track.cancelled_note' => 'This order was cancelled. Contact us if you need help.',
 
     // About ----------------------------------------------------------------
-    'about.title' => 'About Dhaka Hotel',
+    'about.title' => 'About us',
     'about.values_title' => 'How we work',
     'about.value_1_title' => 'Cooked to order',
     'about.value_1_text' => 'Every dish is prepared after you order, in small batches.',
@@ -255,6 +255,7 @@ return [
     'about.demo_note' => 'This demo website uses fictional sample content. Replace it with your own story in the admin settings.',
     'about.hours_title' => 'Opening hours',
     'about.contact_cta' => 'Talk to us',
+    'about.owner_title' => 'Who runs this kitchen',
 
     // Reviews --------------------------------------------------------------
     'reviews.title' => 'Customer reviews',
@@ -302,7 +303,7 @@ return [
 
     // PWA ------------------------------------------------------------------
     'pwa.install' => 'Install app',
-    'pwa.install_title' => 'Install Dhaka Hotel',
+    'pwa.install_title' => 'Install :name',
     'pwa.install_text' => 'Add the app to your home screen for one-tap ordering.',
     'pwa.android_title' => 'Android / Chrome',
     'pwa.android_steps' => 'Open the browser menu and choose “Install app” or “Add to Home screen”.',
@@ -539,8 +540,13 @@ return [
     'admin.names' => 'Restaurant name',
     'admin.tagline' => 'Tagline',
     'admin.description' => 'Description',
+    'admin.owner' => 'Owner',
+    'admin.owner_name' => 'Owner name',
+    'admin.owner_bio' => 'About the owner',
+    'admin.owner_bio_hint' => 'Shown on the About page. Leave the name empty to hide that section.',
     'admin.contact' => 'Contact',
     'admin.phone' => 'Phone number',
+    'admin.phone2' => 'Second phone number',
     'admin.whatsapp' => 'Owner WhatsApp number',
     'admin.whatsapp_hint' => 'Digits only, e.g. 8801712345678. Leave empty to disable WhatsApp buttons.',
     'admin.owner_email' => 'Owner email for payment notifications',
@@ -627,6 +633,7 @@ return [
     'pos.error_empty' => 'Add at least one dish to the bill.',
     'pos.error_generic' => 'Something went wrong. Please try again.',
     'pos.error_amount' => 'The amount received must cover the balance for a full payment.',
+    'pos.error_discount' => 'The discount cannot be more than the bill subtotal.',
     'pos.error_csrf' => 'Your session expired. Reload the page.',
     'pos.pending_bills' => 'Pending bills',
     'pos.no_pending' => 'No pending bills.',

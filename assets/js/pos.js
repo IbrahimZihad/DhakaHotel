@@ -480,14 +480,19 @@
 
   /* --------------------------------------------------------------- filter */
   function applyFilter() {
-    var query = els.search ? els.search.value.trim().toLowerCase() : '';
+    var raw = els.search ? els.search.value.trim().toLowerCase() : '';
+    var terms = raw === '' ? [] : raw.split(/\s+/);
     var cat = state.activeCat;
     var visible = 0;
 
     tiles.forEach(function (tile) {
       var matchCat = cat === 0 || parseInt(tile.getAttribute('data-cat'), 10) === cat;
       var haystack = tile.getAttribute('data-search') || '';
-      var matchText = query === '' || haystack.indexOf(query) !== -1;
+      // Every word must appear somewhere in the name, in any order: "chicken
+      // roast" and "roast chicken" should both find Chicken Roast.
+      var matchText = terms.every(function (term) {
+        return haystack.indexOf(term) !== -1;
+      });
       var show = matchCat && matchText;
       tile.hidden = !show;
       if (show) {
@@ -640,7 +645,7 @@
     if (raw !== '' && raw !== '0') {
       var parsed = parseMoney(raw);
       if (parsed === null || parsed > computeTotals().subtotal) {
-        toast(messages.amount || 'Check the amount.', 'error');
+        toast(messages.discount || 'Check the discount amount.', 'error');
         if (els.discount) { els.discount.focus(); }
         return false;
       }

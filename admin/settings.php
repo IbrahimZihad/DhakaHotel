@@ -19,9 +19,14 @@ $form = [
     'tagline_en' => (string) ($current['tagline_en'] ?? ''),
     'description_bn' => (string) ($current['description_bn'] ?? ''),
     'description_en' => (string) ($current['description_en'] ?? ''),
+    'owner_name_bn' => (string) ($current['owner_name_bn'] ?? ''),
+    'owner_name_en' => (string) ($current['owner_name_en'] ?? ''),
+    'owner_bio_bn' => (string) ($current['owner_bio_bn'] ?? ''),
+    'owner_bio_en' => (string) ($current['owner_bio_en'] ?? ''),
     'address_bn' => (string) ($current['address_bn'] ?? ''),
     'address_en' => (string) ($current['address_en'] ?? ''),
     'phone' => (string) ($current['phone'] ?? ''),
+    'phone2' => (string) ($current['phone2'] ?? ''),
     'whatsapp_number' => (string) ($current['whatsapp_number'] ?? ''),
     'owner_email' => (string) ($current['owner_email'] ?? ''),
     'hours_bn' => (string) ($current['hours_bn'] ?? ''),
@@ -42,7 +47,12 @@ if (is_post()) {
     }
     $form['description_bn'] = clean_text($_POST['description_bn'] ?? '', 1000);
     $form['description_en'] = clean_text($_POST['description_en'] ?? '', 1000);
+    $form['owner_name_bn'] = clean_text($_POST['owner_name_bn'] ?? '', 120);
+    $form['owner_name_en'] = clean_text($_POST['owner_name_en'] ?? '', 120);
+    $form['owner_bio_bn'] = clean_text($_POST['owner_bio_bn'] ?? '', 1000);
+    $form['owner_bio_en'] = clean_text($_POST['owner_bio_en'] ?? '', 1000);
     $form['phone'] = clean_text($_POST['phone'] ?? '', 20);
+    $form['phone2'] = clean_text($_POST['phone2'] ?? '', 20);
     $form['whatsapp_number'] = clean_text($_POST['whatsapp_number'] ?? '', 20);
     $form['owner_email'] = clean_text($_POST['owner_email'] ?? '', 190);
     $form['delivery_fee'] = trim((string) ($_POST['delivery_fee'] ?? ''));
@@ -53,8 +63,10 @@ if (is_post()) {
     if (mb_strlen($form['name_bn'], 'UTF-8') < 2 || mb_strlen($form['name_en'], 'UTF-8') < 2) {
         $errors[] = __('admin.name_error');
     }
-    if ($form['phone'] !== '' && preg_match('/^[0-9+\-\s()]{6,20}$/', $form['phone']) !== 1) {
-        $errors[] = __('admin.invalid_number');
+    foreach (['phone', 'phone2'] as $phoneKey) {
+        if ($form[$phoneKey] !== '' && preg_match('/^[0-9+\-\s()]{6,20}$/', $form[$phoneKey]) !== 1) {
+            $errors[] = __('admin.invalid_number');
+        }
     }
     if ($form['whatsapp_number'] !== '' && !is_valid_bd_phone($form['whatsapp_number'])) {
         $errors[] = __('admin.invalid_number');
@@ -88,9 +100,14 @@ if (is_post()) {
             'tagline_en' => $form['tagline_en'],
             'description_bn' => $form['description_bn'],
             'description_en' => $form['description_en'],
+            'owner_name_bn' => $form['owner_name_bn'],
+            'owner_name_en' => $form['owner_name_en'],
+            'owner_bio_bn' => $form['owner_bio_bn'],
+            'owner_bio_en' => $form['owner_bio_en'],
             'address_bn' => $form['address_bn'],
             'address_en' => $form['address_en'],
             'phone' => $form['phone'],
+            'phone2' => $form['phone2'],
             'whatsapp_number' => $form['whatsapp_number'],
             'owner_email' => $form['owner_email'],
             'hours_bn' => $form['hours_bn'],
@@ -191,10 +208,14 @@ require DH_ROOT . '/includes/partials/admin-head.php';
     <div class="panel">
       <div class="panel-head"><h2><?= e(__('admin.contact')) ?></h2></div>
       <div class="panel-body form-section">
-        <div class="form-row two">
+        <div class="form-row three">
           <div class="field">
             <label for="phone"><?= e(__('admin.phone')) ?></label>
             <input class="input" type="tel" id="phone" name="phone" value="<?= e($form['phone']) ?>" maxlength="20" inputmode="tel">
+          </div>
+          <div class="field">
+            <label for="phone2"><?= e(__('admin.phone2')) ?></label>
+            <input class="input" type="tel" id="phone2" name="phone2" value="<?= e($form['phone2']) ?>" maxlength="20" inputmode="tel">
           </div>
           <div class="field">
             <label for="whatsapp_number"><?= e(__('admin.whatsapp')) ?></label>
@@ -227,6 +248,33 @@ require DH_ROOT . '/includes/partials/admin-head.php';
             <input class="input" type="text" id="hours_en" name="hours_en" value="<?= e($form['hours_en']) ?>" maxlength="160" lang="en">
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2><?= e(__('admin.owner')) ?></h2></div>
+      <div class="panel-body form-section">
+        <div class="form-row two">
+          <div class="field">
+            <label for="owner_name_bn"><?= e(__('admin.owner_name')) ?> (বাংলা)</label>
+            <input class="input" type="text" id="owner_name_bn" name="owner_name_bn" value="<?= e($form['owner_name_bn']) ?>" maxlength="120" lang="bn">
+          </div>
+          <div class="field">
+            <label for="owner_name_en"><?= e(__('admin.owner_name')) ?> (English)</label>
+            <input class="input" type="text" id="owner_name_en" name="owner_name_en" value="<?= e($form['owner_name_en']) ?>" maxlength="120" lang="en">
+          </div>
+        </div>
+        <div class="form-row two">
+          <div class="field">
+            <label for="owner_bio_bn"><?= e(__('admin.owner_bio')) ?> (বাংলা)</label>
+            <textarea class="textarea" id="owner_bio_bn" name="owner_bio_bn" maxlength="1000" lang="bn"><?= e($form['owner_bio_bn']) ?></textarea>
+          </div>
+          <div class="field">
+            <label for="owner_bio_en"><?= e(__('admin.owner_bio')) ?> (English)</label>
+            <textarea class="textarea" id="owner_bio_en" name="owner_bio_en" maxlength="1000" lang="en"><?= e($form['owner_bio_en']) ?></textarea>
+          </div>
+        </div>
+        <p class="hint"><?= e(__('admin.owner_bio_hint')) ?></p>
       </div>
     </div>
 

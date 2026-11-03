@@ -19,17 +19,20 @@ if (is_post()) {
         redirect('reviews.php');
     }
 
-    $form['name'] = clean_text($_POST['display_name'] ?? '', 60);
-    $form['rating'] = (string) parse_int($_POST['rating'] ?? 0);
-    $form['text'] = clean_text($_POST['review_text'] ?? '', 800);
+    $rawName = $_POST['display_name'] ?? '';
+    $rawText = $_POST['review_text'] ?? '';
 
-    if (!v_min_length($form['name'], 2) || !v_max_length($form['name'], 60)) {
+    $form['name'] = clean_text($rawName, 60);
+    $form['rating'] = (string) parse_int($_POST['rating'] ?? 0);
+    $form['text'] = clean_text($rawText, 800);
+
+    if (!v_min_length($form['name'], 2) || !v_raw_max_length($rawName, 60)) {
         $errors['name'] = __('reviews.error_name');
     }
     if ((int) $form['rating'] < 1 || (int) $form['rating'] > 5) {
         $errors['rating'] = __('reviews.error_rating');
     }
-    if (!v_min_length($form['text'], 10) || !v_max_length($form['text'], 800)) {
+    if (!v_min_length($form['text'], 10) || !v_raw_max_length($rawText, 800)) {
         $errors['text'] = __('reviews.error_text');
     }
 

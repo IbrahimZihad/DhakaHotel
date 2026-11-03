@@ -265,6 +265,23 @@
     });
   });
 
+  /* --------------------------------------- checkout delivery method totals */
+  document.addEventListener('change', function (event) {
+    var radio = event.target.closest ? event.target.closest('input[name="delivery_method"]') : null;
+    if (!radio) {
+      return;
+    }
+    var pickup = radio.value === 'pickup';
+    document.querySelectorAll('[data-checkout]').forEach(function (el) {
+      var kind = el.getAttribute('data-checkout');
+      if (kind === 'fee' || kind === 'total-delivery' || kind === 'sticky-delivery') {
+        el.hidden = pickup;
+      } else if (kind === 'total-pickup' || kind === 'sticky-pickup') {
+        el.hidden = !pickup;
+      }
+    });
+  });
+
   /* --------------------------------------------------------------- misc */
   document.addEventListener('DOMContentLoaded', function () {
     var countEl = document.getElementById('cart-count');

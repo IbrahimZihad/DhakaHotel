@@ -47,9 +47,14 @@ if ($activeCategory !== null) {
     $params[] = (int) $activeCategory['id'];
 }
 if ($search !== '') {
-    $like = '%' . addcslashes($search, '%_\\') . '%';
-    $where[] = '(mi.name_bn LIKE ? ESCAPE \'\\\\\' OR mi.name_en LIKE ? ESCAPE \'\\\\\' OR mi.description_bn LIKE ? ESCAPE \'\\\\\' OR mi.description_en LIKE ? ESCAPE \'\\\\\')';
-    array_push($params, $like, $like, $like, $like);
+    // One ANDed group per word so "chicken biryani" and "biryani chicken"
+    // both match, instead of requiring the exact phrase.
+    $terms = preg_split('/\s+/u', $search, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+    foreach ($terms as $term) {
+        $like = '%' . addcslashes($term, '%_\\') . '%';
+        $where[] = '(mi.name_bn LIKE ? ESCAPE \'\\\\\' OR mi.name_en LIKE ? ESCAPE \'\\\\\' OR mi.description_bn LIKE ? ESCAPE \'\\\\\' OR mi.description_en LIKE ? ESCAPE \'\\\\\')';
+        array_push($params, $like, $like, $like, $like);
+    }
 }
 $whereSql = implode(' AND ', $where);
 

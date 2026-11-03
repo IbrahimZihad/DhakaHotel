@@ -15,6 +15,20 @@ function v_max_length(string $value, int $max): bool
     return mb_strlen(trim($value), 'UTF-8') <= $max;
 }
 
+/**
+ * Length check that must run on the RAW input. clean_text() truncates to its
+ * limit, so calling v_max_length() on the cleaned value can never fail and
+ * over-long input is silently cut instead of rejected.
+ */
+function v_raw_max_length(mixed $value, int $max): bool
+{
+    if (!is_string($value)) {
+        return true;
+    }
+
+    return mb_strlen(trim($value), 'UTF-8') <= $max;
+}
+
 function v_min_length(string $value, int $min): bool
 {
     return mb_strlen(trim($value), 'UTF-8') >= $min;
@@ -157,7 +171,24 @@ function store_menu_image(array $file, string $lang = 'en'): array
     }
 
     // Hard requirement: never leave anything executable in uploads/.
-    @file_put_contents($directory . '/.htaccess', "php_flag engine off\nOptions -ExecCGI -Indexes\n<FilesMatch \"\\.(php|phtml|phar|cgi|pl)$\">\nRequire all denied\n</FilesMatch>\n");
+    // php_flag must stay inside <IfModule> — on a PHP-FPM/FastCGI host the
+    // bare directive is unknown and Apache answers 500 for every menu image.
+    $guardPath = $directory . '/.htaccess';
+    if (!is_file($guardPath)) {
+        @file_put_contents($guardPath, implode("\n", [
+            '<IfModule mod_php.c>',
+            '  php_flag engine off',
+            '</IfModule>',
+            '<IfModule mod_php7.c>',
+            '  php_flag engine off',
+            '</IfModule>',
+            'Options -ExecCGI -Indexes',
+            '<FilesMatch "\.(php|phtml|phar|pl|py|cgi|sh|htaccess)$">',
+            '  Require all denied',
+            '</FilesMatch>',
+            '',
+        ]));
+    }
 
     return ['ok' => true, 'path' => 'menu/' . $filename];
 }
