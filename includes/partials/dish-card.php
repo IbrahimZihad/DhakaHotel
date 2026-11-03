@@ -14,12 +14,13 @@ $categoryName = '';
 if ($showCategory && isset($dish['category_name_bn'])) {
     $categoryName = localized($dish, 'category_name');
 }
+$categoryClass = category_class($dish['category_slug'] ?? null);
 ?>
-<article class="dish-card<?= $available ? '' : ' is-unavailable' ?>">
+<article class="dish-card<?= $categoryClass ?><?= $available ? '' : ' is-unavailable' ?>">
   <a class="dish-media" href="<?= e($detailUrl) ?>" tabindex="-1" aria-hidden="true">
     <img src="<?= e($image) ?>" alt="<?= e($dishName) ?>" width="600" height="450" loading="lazy" decoding="async">
     <?php if (!empty($dish['is_featured'])): ?>
-    <span class="badge"><?= e(__('common.featured')) ?></span>
+    <span class="badge badge-featured"><?= icon('star') ?><?= e(__('common.featured')) ?></span>
     <?php endif; ?>
     <?php if (!$available): ?>
     <span class="badge badge-danger"><?= e(__('menu.unavailable')) ?></span>

@@ -85,6 +85,17 @@ function menu_image_url(?string $relativePath): string
     return asset('assets/images/menu/placeholder.svg');
 }
 
+/**
+ * CSS class carrying a category's colour, from its slug. Returns '' when there
+ * is no slug so callers can append it unconditionally.
+ */
+function category_class(?string $slug): string
+{
+    $safe = (string) preg_replace('/[^a-z0-9_-]/', '', strtolower(trim((string) $slug)));
+
+    return $safe === '' ? '' : ' cat-' . $safe;
+}
+
 function redirect(string $path, int $code = 302): never
 {
     if (preg_match('#^https?://#i', $path)) {

@@ -52,10 +52,25 @@
   };
 
   /* ------------------------------------------------------------ cart badge */
+  function bump(el) {
+    el.classList.remove('is-bump');
+    // Force a reflow so re-adding the class restarts the animation.
+    void el.offsetWidth;
+    el.classList.add('is-bump');
+    el.addEventListener('animationend', function handler() {
+      el.classList.remove('is-bump');
+      el.removeEventListener('animationend', handler);
+    });
+  }
+
   function setCartCount(count) {
+    var value = Number(count) || 0;
     document.querySelectorAll('#cart-count, [data-cart-count]').forEach(function (el) {
-      el.textContent = DH.formatCount ? DH.formatCount(count) : String(count);
-      el.hidden = !count || count <= 0;
+      el.textContent = DH.formatCount ? DH.formatCount(value) : String(value);
+      el.hidden = value <= 0;
+      if (!el.hidden) {
+        bump(el);
+      }
     });
   }
   DH.setCartCount = setCartCount;
@@ -103,6 +118,11 @@
       DH.post(apiUrl(), fd).then(function (data) {
         if (data.ok) {
           setCartCount(data.cart ? data.cart.count : 0);
+          if (button) {
+            button.classList.remove('is-added');
+            void button.offsetWidth;
+            button.classList.add('is-added');
+          }
           toast(data.message || 'Added to cart', 'success');
         } else {
           toast(data.message || 'Could not add this item', 'error');
@@ -281,6 +301,81 @@
       }
     });
   });
+
+  /* ------------------------------------------------------------ reveal */
+  function initReveal() {
+    var targets = [];
+    // Cards, panels and reviews stagger in one by one as their row enters view.
+    document.querySelectorAll('.dish-grid, .feature-grid, .review-grid').forEach(function (group) {
+      Array.prototype.forEach.call(group.children, function (child, index) {
+        child.style.setProperty('--reveal-delay', Math.min(index * 55, 330) + 'ms');
+        targets.push(child);
+      });
+    });
+    // Chip rows scroll sideways, so they fade in as a block: revealing single
+    // chips would leave the clipped end of the row blank mid-swipe.
+    document.querySelectorAll('.section-head, .chip-row').forEach(function (el) {
+      targets.push(el);
+    });
+    if (targets.length === 0) {
+      return;
+    }
+
+    var viewport = window.innerHeight || 0;
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) {
+          return;
+        }
+        observer.unobserve(entry.target);
+        entry.target.classList.add('is-revealed');
+      });
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.01 });
+
+    targets.forEach(function (el) {
+      el.classList.add('reveal');
+    });
+    document.documentElement.classList.add('has-reveal');
+
+    // Anything already on screen is marked in this same tick so it never
+    // paints hidden; the rest waits for the observer.
+    targets.forEach(function (el) {
+      if (el.getBoundingClientRect().top < viewport * 0.9) {
+        observer.unobserve(el);
+        el.classList.add('is-revealed');
+      } else {
+        observer.observe(el);
+      }
+    });
+  }
+
+  // Never hide content in a page that is not being rendered (background tab,
+  // prerender, zero-height frame). Wait until it is actually visible.
+  var revealStarted = false;
+  function tryReveal() {
+    if (revealStarted) {
+      return;
+    }
+    if (document.visibilityState === 'hidden' || (window.innerHeight || 0) <= 0) {
+      return;
+    }
+    if (!('IntersectionObserver' in window)) {
+      return;
+    }
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (reduce && reduce.matches) {
+      return;
+    }
+    revealStarted = true;
+    try {
+      initReveal();
+    } catch (e) {
+      // Fail open: without has-reveal every element renders at full opacity.
+      document.documentElement.classList.remove('has-reveal');
+    }
+  }
+  document.addEventListener('visibilitychange', tryReveal);
+  tryReveal();
 
   /* --------------------------------------------------------------- misc */
   document.addEventListener('DOMContentLoaded', function () {

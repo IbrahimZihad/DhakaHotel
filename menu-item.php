@@ -44,12 +44,13 @@ $unitCents = cents_from_decimal((string) $dish['price']);
 $companions = fetch_all(
     "SELECT mi.* FROM menu_items mi
      JOIN categories c ON c.id = mi.category_id
-     WHERE c.slug IN ('drinks', 'desserts') AND c.is_active = 1 AND mi.is_available = 1 AND mi.id <> ?
+     WHERE c.slug IN ('drinks-desserts') AND c.is_active = 1 AND mi.is_available = 1 AND mi.id <> ?
      ORDER BY RAND() LIMIT 3",
     [$itemId]
 );
 $related = fetch_all(
-    'SELECT mi.* FROM menu_items mi
+    'SELECT mi.*, c.slug AS category_slug FROM menu_items mi
+     JOIN categories c ON c.id = mi.category_id
      WHERE mi.category_id = ? AND mi.id <> ? AND mi.is_available = 1
      ORDER BY mi.sort_order ASC LIMIT 4',
     [(int) $dish['category_id'], $itemId]

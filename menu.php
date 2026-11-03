@@ -68,7 +68,7 @@ $orderSql = match ($sort) {
     'price_asc' => 'mi.price ASC, mi.name_en ASC',
     'price_desc' => 'mi.price DESC, mi.name_en ASC',
     'name' => (current_lang() === 'bn' ? 'mi.name_bn ASC' : 'mi.name_en ASC'),
-    default => 'mi.is_featured DESC, mi.sort_order ASC, mi.id ASC',
+    default => 'mi.sort_order ASC, mi.id ASC',
 };
 
 $perPage = 24;
@@ -105,7 +105,7 @@ require DH_ROOT . '/includes/partials/flash.php';
         <?= e(__('common.all')) ?>
       </a>
       <?php foreach ($categories as $category): ?>
-      <a class="chip" href="<?= e(url('menu.php') . query_string_with(['category' => $category['slug'], 'page' => null])) ?>"
+      <a class="chip<?= category_class($category['slug'] ?? null) ?>" href="<?= e(url('menu.php') . query_string_with(['category' => $category['slug'], 'page' => null])) ?>"
          <?= $activeCategory !== null && $activeCategory['slug'] === $category['slug'] ? 'aria-pressed="true"' : '' ?>>
         <?= e(item_name($category)) ?>
       </a>

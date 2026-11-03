@@ -13,7 +13,7 @@ $categories = fetch_all(
 );
 
 $featured = fetch_all(
-    'SELECT mi.*, c.name_bn AS category_name_bn, c.name_en AS category_name_en
+    'SELECT mi.*, c.name_bn AS category_name_bn, c.name_en AS category_name_en, c.slug AS category_slug
      FROM menu_items mi
      JOIN categories c ON c.id = mi.category_id
      WHERE mi.is_featured = 1 AND mi.is_available = 1 AND c.is_active = 1
@@ -21,14 +21,14 @@ $featured = fetch_all(
 );
 
 $popular = fetch_all(
-    "SELECT mi.*, c.name_bn AS category_name_bn, c.name_en AS category_name_en, SUM(oi.quantity) AS sold
+    "SELECT mi.*, c.name_bn AS category_name_bn, c.name_en AS category_name_en, c.slug AS category_slug, SUM(oi.quantity) AS sold
      FROM order_items oi
      JOIN orders o ON o.id = oi.order_id
      JOIN menu_items mi ON mi.id = oi.menu_item_id
      JOIN categories c ON c.id = mi.category_id
      WHERE o.status <> 'cancelled' AND mi.is_available = 1 AND c.is_active = 1
        AND o.created_at >= (NOW() - INTERVAL 30 DAY)
-     GROUP BY mi.id, c.name_bn, c.name_en
+     GROUP BY mi.id, c.name_bn, c.name_en, c.slug
      ORDER BY sold DESC, mi.is_featured DESC
      LIMIT 4"
 );
@@ -87,7 +87,7 @@ require DH_ROOT . '/includes/partials/flash.php';
       </div>
       <div class="chip-row">
         <?php foreach ($categories as $category): ?>
-        <a class="chip" href="<?= e(url('menu.php') . '?category=' . urlencode((string) $category['slug'])) ?>">
+        <a class="chip<?= category_class($category['slug'] ?? null) ?>" href="<?= e(url('menu.php') . '?category=' . urlencode((string) $category['slug'])) ?>">
           <?= icon('utensils') ?><?= e(item_name($category)) ?>
         </a>
         <?php endforeach; ?>
