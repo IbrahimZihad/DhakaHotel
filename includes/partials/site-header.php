@@ -13,7 +13,8 @@ $navItems = [
 ];
 $cartQty = cart_count();
 $waLink = whatsapp_link(__('nav.whatsapp'));
-$tagline = restaurant('tagline');
+$ownerName = restaurant('owner_name');
+$ownerPhone = trim((string) setting('phone', ''));
 $location = restaurant('address');
 ?>
 <header class="site-header">
@@ -22,10 +23,14 @@ $location = restaurant('address');
       <?= brand_logo_html() ?>
       <span class="brand-name">
         <span><?= e(restaurant_name()) ?></span>
-        <?php if ($tagline !== '' && $tagline !== restaurant_name()): ?>
-        <small><?= e($tagline) ?></small>
+        <?php if ($ownerName !== '' || $ownerPhone !== ''): ?>
+        <small class="brand-owner">
+          <?php if ($ownerName !== ''): ?><span><?= e($ownerName) ?></span><?php endif; ?>
+          <?php if ($ownerName !== '' && $ownerPhone !== ''): ?><span class="brand-dot" aria-hidden="true">·</span><?php endif; ?>
+          <?php if ($ownerPhone !== ''): ?><span><?= e($ownerPhone) ?></span><?php endif; ?>
+        </small>
         <?php endif; ?>
-        <?php if ($location !== '' && $location !== $tagline): ?>
+        <?php if ($location !== ''): ?>
         <small class="brand-loc"><?= icon('map-pin') ?><span><?= e($location) ?></span></small>
         <?php endif; ?>
       </span>

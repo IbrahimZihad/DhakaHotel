@@ -56,6 +56,27 @@ function asset(string $path): string
     return url($path) . '?v=' . config('app.asset_version', '1');
 }
 
+/**
+ * Scheme + host for social crawlers, which cannot read a relative URL.
+ * APP_URL wins; without it the request host is used, so local XAMPP works.
+ */
+function site_origin(): string
+{
+    $configured = trim((string) config('app.url', ''));
+    if ($configured !== '') {
+        return $configured;
+    }
+
+    $host = (string) ($_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost');
+
+    return (is_https() ? 'https://' : 'http://') . $host;
+}
+
+function absolute_url(string $path = ''): string
+{
+    return site_origin() . url($path);
+}
+
 function upload_url(?string $relativePath): ?string
 {
     if ($relativePath === null || trim($relativePath) === '') {

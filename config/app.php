@@ -6,6 +6,7 @@ return [
     'env' => (string) env('APP_ENV', 'local'),
     'debug' => (bool) env('APP_DEBUG', true),
     'base_path' => rtrim((string) env('APP_BASE_PATH', ''), '/'),
+    'url' => rtrim((string) env('APP_URL', ''), '/'),
     'timezone' => (string) env('APP_TIMEZONE', 'Asia/Dhaka'),
     'demo_mode' => (bool) env('APP_DEMO_MODE', true),
     'default_lang' => 'bn',

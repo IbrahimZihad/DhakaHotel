@@ -74,7 +74,7 @@
 }
 .admin-topbar .brand-mark svg { width: 21px; height: 21px; }
 .admin-topbar .brand-logo {
-  height: 30px;
+  height: 34px;
   width: auto;
   background: var(--a-surface);
   border-radius: 9px;
@@ -482,7 +482,7 @@ html[lang="bn"] .table th { text-transform: none; letter-spacing: 0; }
   background: linear-gradient(150deg, var(--brand-500), var(--brand-700));
   box-shadow: 0 8px 18px rgba(194, 90, 37, 0.3);
 }
-.login-brand .brand-logo { height: 52px; width: auto; }
+.login-brand .brand-logo { height: 64px; width: auto; }
 .login-brand h1 { font-size: var(--fs-lg); }
 .login-brand p { font-size: var(--fs-xs); color: var(--a-muted); }
 .login-card .field { margin-bottom: 14px; }

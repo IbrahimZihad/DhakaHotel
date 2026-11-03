@@ -457,9 +457,9 @@ html[lang="bn"] .eyebrow { text-transform: none; letter-spacing: 0; }
   box-shadow: 0 6px 14px rgba(194, 90, 37, 0.3);
 }
 .brand-mark svg { width: 24px; height: 24px; }
-/* The real logo is 3:2, so height drives its width inside the 64px header. */
-.brand-logo { height: 46px; width: auto; display: block; flex: none; }
-@media (min-width: 860px) { .brand-logo { height: 50px; } }
+/* Square crest, so height drives both axes inside the fixed 64px header. */
+.brand-logo { height: 50px; width: auto; display: block; flex: none; }
+@media (min-width: 860px) { .brand-logo { height: 56px; } }
 /* The crest is black and gold, so on a charcoal plate it needs its own light chip. */
 .site-header .brand-logo,
 .site-footer .brand-logo {
@@ -468,12 +468,16 @@ html[lang="bn"] .eyebrow { text-transform: none; letter-spacing: 0; }
   padding: 4px 8px;
   box-shadow: inset 0 0 0 1px rgba(201, 168, 103, 0.55);
 }
-.site-footer .brand-logo { height: 40px; }
+.site-footer .brand-logo { height: 44px; }
 .brand-name { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
 .brand-name small { font-size: 0.68rem; font-weight: 500; color: var(--ink-500); letter-spacing: 0.02em; }
 .brand-name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .brand-loc { display: flex; align-items: center; gap: 4px; font-size: 0.64rem; min-width: 0; }
 .brand-loc svg { width: 11px; height: 11px; flex: none; }
+.brand-owner { display: flex; align-items: center; gap: 5px; min-width: 0; }
+.brand-owner span:first-child { min-width: 0; }
+.brand-owner span:last-child { flex: none; }
+.brand-owner .brand-dot { color: var(--gold-400); }
 
 /* Shared with the footer and admin topbar, so the dark treatment is scoped. */
 .site-header .brand { color: var(--on-dark); }

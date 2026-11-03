@@ -110,7 +110,7 @@ function brand_logo_html(): string
 {
     if (is_file(DH_ROOT . '/assets/images/logo.webp')) {
         return '<img class="brand-logo" src="' . e(asset('assets/images/logo.webp')) . '"'
-            . ' width="640" height="427" alt="" loading="eager" decoding="async">';
+            . ' width="512" height="512" alt="" loading="eager" decoding="async">';
     }
 
     return '<span class="brand-mark">' . brand_mark_svg() . '</span>';
