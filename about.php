@@ -44,7 +44,7 @@ require DH_ROOT . '/includes/partials/flash.php';
           </div>
         </div>
       </div>
-      <img src="<?= e(asset('assets/images/menu/kacchi-biryani.svg')) ?>" alt="<?= e(__('home.hero_image_alt')) ?>" width="1200" height="900" loading="lazy">
+      <img src="<?= e(menu_image_url('menu/kacchi-biryani.webp')) ?>" alt="<?= e(__('home.hero_image_alt')) ?>" width="1200" height="900" loading="lazy">
     </div>
 
     <?php $ownerName = restaurant('owner_name'); ?>

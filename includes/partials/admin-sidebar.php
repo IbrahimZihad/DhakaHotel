@@ -44,7 +44,7 @@ $navItem = static function (string $key, string $href, string $icon, string $lab
     $navItem('profile', 'admin/profile.php', 'user', __('admin.nav_profile'));
     ?>
 
-    <div class="divider" style="height:1px;background:#e2eae2;margin:10px 4px" aria-hidden="true"></div>
+    <div class="divider" style="height:1px;background:var(--a-line);margin:10px 4px" aria-hidden="true"></div>
     <a href="<?= e(url('index.php')) ?>" target="_blank" rel="noopener"><?= icon('external') ?><span><?= e(__('admin.nav_view_site')) ?></span></a>
     <form method="post" action="<?= e(url('admin/logout.php')) ?>">
       <?= csrf_field() ?>

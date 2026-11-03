@@ -23,7 +23,7 @@ body {
   justify-content: center;
   flex-wrap: wrap;
   padding: 10px;
-  background: #222;
+  background: #211d1a;
 }
 .receipt-toolbar a,
 .receipt-toolbar button {
@@ -32,20 +32,20 @@ body {
   border: 0;
   border-radius: 999px;
   padding: 8px 16px;
-  background: #4e9e52;
+  background: #a5481b;
   color: #fff;
   cursor: pointer;
 }
-.receipt-toolbar a.secondary { background: #555; }
+.receipt-toolbar a.secondary { background: #4a4038; }
 .receipt-toolbar .paper-links { display: flex; gap: 6px; }
 .receipt-toolbar .paper-links a {
-  background: #fff;
-  color: #222;
+  background: #fffdf7;
+  color: #211d1a;
   padding: 6px 12px;
 }
-.receipt-toolbar .paper-links a.active { background: #4e9e52; color: #fff; }
-.receipt-toolbar .lang-links a { background: #fff; color: #222; padding: 6px 12px; }
-.receipt-toolbar .lang-links a.active { background: #4e9e52; color: #fff; }
+.receipt-toolbar .paper-links a.active { background: #a5481b; color: #fff; }
+.receipt-toolbar .lang-links a { background: #fffdf7; color: #211d1a; padding: 6px 12px; }
+.receipt-toolbar .lang-links a.active { background: #a5481b; color: #fff; }
 
 .receipt {
   background: #fff;

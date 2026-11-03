@@ -66,7 +66,7 @@ require DH_ROOT . '/includes/partials/flash.php';
           </div>
         </div>
         <div class="hero-visual">
-          <img src="<?= e(asset('assets/images/hero.svg')) ?>" alt="<?= e(__('home.hero_image_alt')) ?>" width="1200" height="900" fetchpriority="high">
+          <img src="<?= e(menu_image_url('menu/seek-kabab.webp')) ?>" alt="<?= e(__('home.hero_image_alt')) ?>" width="1200" height="900" fetchpriority="high">
           <div class="hero-float">
             <?= icon('moped') ?>
             <span><?= e(__('home.delivery_fee', ['amount' => money(delivery_fee_cents())])) ?></span>
@@ -147,7 +147,7 @@ require DH_ROOT . '/includes/partials/flash.php';
             <div class="stat"><b><?= e(__('home.stat_delivery_value')) ?></b><span><?= e(__('home.stat_delivery')) ?></span></div>
           </div>
         </div>
-        <img src="<?= e(asset('assets/images/menu/chicken-biryani.svg')) ?>" alt="<?= e(__('home.hero_image_alt')) ?>" width="1200" height="900" loading="lazy">
+        <img src="<?= e(menu_image_url('menu/chicken-biryani.webp')) ?>" alt="<?= e(__('home.hero_image_alt')) ?>" width="1200" height="900" loading="lazy">
       </div>
     </div>
   </section>

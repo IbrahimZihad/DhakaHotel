@@ -27,7 +27,7 @@ if (mb_strlen($metaDescription) > 155) {
 <?php if ($metaDescription !== ''): ?>
 <meta name="description" content="<?= e($metaDescription) ?>">
 <?php endif; ?>
-<meta name="theme-color" content="#f4537d">
+<meta name="theme-color" content="#211d1a">
 <meta name="color-scheme" content="light">
 <meta name="csrf-token" content="<?= e(csrf_token()) ?>">
 <meta property="og:title" content="<?= e($fullTitle) ?>">

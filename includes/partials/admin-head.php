@@ -23,7 +23,7 @@ $fullTitle = ($pageTitle !== '' ? $pageTitle . ' · ' : '') . $siteName;
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title><?= e($fullTitle) ?></title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#3d8542">
+<meta name="theme-color" content="#211d1a">
 <meta name="color-scheme" content="light">
 <meta name="csrf-token" content="<?= e(csrf_token()) ?>">
 <link rel="icon" href="<?= e(asset('assets/images/icons/icon-192.png')) ?>" sizes="192x192">

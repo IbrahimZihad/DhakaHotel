@@ -16,7 +16,7 @@ $dir = $lang === 'bn' ? 'ltr' : 'ltr';
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= e(__('pwa.offline_title')) ?></title>
-<meta name="theme-color" content="#f4537d">
+<meta name="theme-color" content="#211d1a">
 <meta name="robots" content="noindex">
 <link rel="icon" href="<?= e(asset('assets/images/icons/icon-192.png')) ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,7 +26,7 @@ $dir = $lang === 'bn' ? 'ltr' : 'ltr';
 <style>
   .offline-wrap { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
   .offline-card { max-width: 460px; text-align: center; padding: clamp(28px, 6vw, 44px); }
-  .offline-icon { width: 84px; height: 84px; border-radius: 50%; background: var(--pink-100); color: var(--pink-600); display: grid; place-items: center; margin: 0 auto 18px; }
+  .offline-icon { width: 84px; height: 84px; border-radius: 50%; background: var(--orange-100); color: var(--orange-600); display: grid; place-items: center; margin: 0 auto 18px; }
   .offline-icon svg { width: 40px; height: 40px; }
 </style>
 </head>
