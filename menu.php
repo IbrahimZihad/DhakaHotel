@@ -28,6 +28,11 @@ if (mb_strlen($search) > 60) {
 }
 $categorySlug = (string) ($_GET['category'] ?? '');
 $activeCategory = $categoryBySlug[$categorySlug] ?? null;
+// A slug matching no category is a broken link, not a filter. Answering with the
+// whole menu would return a soft 200 and duplicate the real listing.
+if ($categorySlug !== '' && $activeCategory === null) {
+    require DH_ROOT . '/includes/partials/not-found.php';
+}
 
 $sortOptions = [
     'default' => __('menu.sort_default'),
@@ -83,12 +88,30 @@ $items = $total > 0 ? fetch_all(
     $params
 ) : [];
 
-$pageTitle = __('menu.title');
-$pageDescription = __('menu.subtitle');
+$titleTag = __('menu.title_tag', ['restaurant' => restaurant_name()]);
+$pageDescription = __('menu.meta_description', ['restaurant' => restaurant_name()]);
+// Category and page define a distinct listing; sort and q only reorder or
+// filter the same rows, and on-site search results are not landing pages.
+$canonicalKeep = ['category', 'page'];
+$robots = $search !== '' ? 'noindex, follow' : 'index, follow';
 // The Menu node describes the whole card, so it only belongs on the unfiltered
 // first page; a search or category result would contradict its own markup.
 $isBrowsedMenu = $search === '' && $activeCategory === null && $sort === 'default' && $pageData['page'] === 1;
 $seo = $isBrowsedMenu ? ['menu' => true] : [];
+if ($activeCategory !== null) {
+    $categoryParams = [
+        'category' => item_name($activeCategory),
+        'restaurant' => restaurant_name(),
+        'count' => is_bn() ? bn_digits((string) $total) : (string) $total,
+    ];
+    $titleTag = __('menu.category_title_tag', $categoryParams);
+    $pageDescription = __('menu.category_meta_description', $categoryParams);
+}
+if ($pageData['page'] > 1) {
+    $titleTag .= ' · ' . __('menu.page_number', [
+        'page' => is_bn() ? bn_digits((string) $pageData['page']) : (string) $pageData['page'],
+    ]);
+}
 $activeNav = 'menu';
 require DH_ROOT . '/includes/partials/site-head.php';
 require DH_ROOT . '/includes/partials/site-header.php';

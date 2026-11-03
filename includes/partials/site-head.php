@@ -10,6 +10,8 @@
  *   $ogImageAlt      string  optional alt text for the share image
  *   $ogType          string  optional Open Graph type, default 'website'
  *   $robots          string  default 'index, follow'
+ *   $titleTag        string  optional complete title, bypassing the site suffix
+ *   $canonicalKeep   array   whitelist of query params that define this page
  *   $seo             array   structured-data context, see seo_graph()
  */
 
@@ -17,7 +19,10 @@ $pageTitle = $pageTitle ?? '';
 $pageDescription = $pageDescription ?? restaurant('description');
 $bodyClass = $bodyClass ?? '';
 $siteName = restaurant_name();
-$fullTitle = $pageTitle !== '' ? $pageTitle . ' · ' . $siteName : $siteName;
+// The homepage writes its own complete title so the brand can lead it.
+$fullTitle = ($titleTag ?? '') !== ''
+    ? (string) $titleTag
+    : ($pageTitle !== '' ? $pageTitle . ' · ' . $siteName : $siteName);
 
 $metaDescription = trim(strip_tags($pageDescription));
 if (mb_strlen($metaDescription) > 155) {
@@ -25,12 +30,27 @@ if (mb_strlen($metaDescription) > 155) {
 }
 
 // Canonical: current path and query, minus the language switcher parameter.
-$canonicalQuery = $_GET;
-unset($canonicalQuery['lang']);
 $canonicalPath = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
 $basePath = (string) config('app.base_path', '');
 if ($basePath !== '' && str_starts_with($canonicalPath, $basePath)) {
     $canonicalPath = substr($canonicalPath, strlen($basePath));
+}
+// /index.php and / serve the same page, so the directory form is the canonical
+// one and the two URLs cannot be indexed as duplicates.
+if (strtolower(basename($canonicalPath)) === 'index.php') {
+    $canonicalPath = rtrim(substr($canonicalPath, 0, -strlen('index.php')), '/') . '/';
+}
+$canonicalQuery = $_GET;
+unset($canonicalQuery['lang']);
+// A page may whitelist the parameters that actually define it. Sort orders and
+// search refinements only produce duplicate views of the same list, so leaving
+// them in the canonical invites Google to index each permutation.
+$canonicalKeep = $canonicalKeep ?? null;
+if (is_array($canonicalKeep)) {
+    $canonicalQuery = array_intersect_key($canonicalQuery, array_flip($canonicalKeep));
+}
+if (($canonicalQuery['page'] ?? '') === '1') {
+    unset($canonicalQuery['page']);
 }
 $canonicalUrl = absolute_url(ltrim($canonicalPath, '/') . ($canonicalQuery !== [] ? '?' . http_build_query($canonicalQuery) : ''));
 
@@ -63,16 +83,7 @@ $langUrl = static function (string $locale) use ($canonicalPath, $canonicalQuery
 
 // Structured data describes an indexable page; a noindex cart step has nothing
 // to advertise and the Restaurant node there only duplicates the menu page.
-$seo = $seo ?? [];
-$seoJson = '';
-if (!str_contains($robots, 'noindex')) {
-    $seo += [
-        'url' => $canonicalUrl,
-        'title' => $fullTitle,
-        'description' => $metaDescription,
-    ];
-    $seoJson = seo_json_ld_tag($seo);
-}
+$seoJson = str_contains($robots, 'noindex') ? '' : seo_json_ld_tag($seo ?? []);
 ?><!doctype html>
 <html lang="<?= e(current_lang()) ?>">
 <head>

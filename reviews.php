@@ -60,7 +60,7 @@ $reviews = $total > 0 ? fetch_all(
 $average = $total > 0 ? (float) fetch_value('SELECT AVG(rating) FROM reviews WHERE status = ?', ['approved'], 0) : 0.0;
 
 $pageTitle = __('reviews.title');
-$pageDescription = __('reviews.subtitle');
+$pageDescription = __('reviews.meta_description', ['restaurant' => restaurant_name()]);
 $activeNav = 'reviews';
 require DH_ROOT . '/includes/partials/site-head.php';
 require DH_ROOT . '/includes/partials/site-header.php';

@@ -406,8 +406,6 @@ function seo_product_node(array $dish): array
  *   'menu'        => true to attach the full Menu node
  *   'item'        => dish row, adds the Product node
  *   'breadcrumbs' => trail for seo_breadcrumb_node()
- *   'sections'    => [['name' => .., 'text' => ..], ...] article headings
- *   'title'/'description'/'url' => current page metadata
  */
 function seo_graph(array $page = []): array
 {
@@ -430,30 +428,6 @@ function seo_graph(array $page = []): array
 
     if (isset($page['item']) && is_array($page['item'])) {
         $nodes['product'] = seo_product_node($page['item']);
-    }
-
-    $sections = [];
-    foreach (($page['sections'] ?? []) as $section) {
-        $text = trim(strip_tags((string) ($section['text'] ?? '')));
-        $name = trim((string) ($section['name'] ?? ''));
-        if ($text === '' || $name === '') {
-            continue;
-        }
-        $sections[] = ['@type' => 'WebPageElement', 'name' => $name, 'text' => $text];
-    }
-    if ($sections !== []) {
-        $pageUrl = seo_asset_url((string) ($page['url'] ?? ''));
-        $nodes['webpage'] = array_filter([
-            '@type' => 'WebPage',
-            '@id' => $pageUrl . '#webpage',
-            'url' => $pageUrl,
-            'name' => (string) ($page['title'] ?? restaurant_name()),
-            'description' => (string) ($page['description'] ?? trim(strip_tags(restaurant('description')))),
-            'inLanguage' => current_lang(),
-            'isPartOf' => ['@id' => seo_website_id()],
-            'about' => ['@id' => seo_restaurant_id()],
-            'hasPart' => $sections,
-        ], static fn (mixed $v): bool => $v !== '' && $v !== [] && $v !== null);
     }
 
     return array_values($nodes);

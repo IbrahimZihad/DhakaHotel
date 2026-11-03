@@ -100,7 +100,10 @@ return [
     'home.hero_text' => 'Home-style Bangladeshi food cooked in small batches and sent out hot. Order in Bangla or English — whichever feels like home.',
     'home.hero_cta_menu' => 'Browse the menu',
     'home.hero_cta_order' => 'Start an order',
-    'home.hero_image_alt' => 'A plate of biryani served with salad',
+    'home.hero_image_alt' => 'Charcoal-grilled seek kabab served on a plate',
+    'home.cta_image_alt' => 'A plate of biryani served with salad',
+    'home.title_tag' => '{restaurant} — Kabab & Biryani in Purbachal, Dhaka',
+    'home.meta_description' => 'Charcoal-grilled kabab, kacchi biryani, tehari and homely Bangladeshi dishes, cooked fresh in Purbachal. Order online or call - open daily, 11am to 11pm.',
     'home.categories_title' => 'What are you craving?',
     'home.categories_text' => 'Pick a category and jump straight to the dishes.',
     'home.featured_title' => 'Featured dishes',
@@ -132,6 +135,11 @@ return [
     // Menu -----------------------------------------------------------------
     'menu.title' => 'Our menu',
     'menu.subtitle' => 'Live prices and availability, straight from the kitchen.',
+    'menu.meta_description' => 'The full {restaurant} menu with live prices: kabab, paratha, biryani, meat, fish, bhorta, curries and desserts. Delivered across Purbachal, Dhaka.',
+    'menu.title_tag' => 'Menu — Kabab, Biryani, Bread & Desserts · {restaurant}',
+    'menu.category_title_tag' => '{category} — {restaurant}, Purbachal',
+    'menu.category_meta_description' => '{count} {category} dishes at {restaurant}, with live prices, cooked to order and delivered across Purbachal, Dhaka.',
+    'menu.page_number' => 'page {page}',
     'menu.search_placeholder' => 'Search dishes…',
     'menu.search_label' => 'Search the menu',
     'menu.sort_label' => 'Sort by',
@@ -154,6 +162,7 @@ return [
     'dish.buy_now' => 'Buy now',
     'dish.back_to_menu' => 'Back to menu',
     'dish.not_found' => 'That dish could not be found.',
+    'dish.meta_description' => '{dish} from the {category} section at {restaurant} in Purbachal. Price {price}, cooked to order and delivered hot. Order online or call.',
     'dish.category' => 'Category',
     'dish.about' => 'About this dish',
 
@@ -245,6 +254,7 @@ return [
 
     // About ----------------------------------------------------------------
     'about.title' => 'About us',
+    'about.meta_description' => '{restaurant}, a restaurant and party centre in Jolshiri, Purbachal. Charcoal kabab and kacchi biryani, cooked the way it is made at home.',
     'about.values_title' => 'How we work',
     'about.value_1_title' => 'Cooked to order',
     'about.value_1_text' => 'Every dish is prepared after you order, in small batches.',
@@ -260,6 +270,7 @@ return [
     // Reviews --------------------------------------------------------------
     'reviews.title' => 'Customer reviews',
     'reviews.subtitle' => 'Reviews are published after the restaurant team approves them.',
+    'reviews.meta_description' => 'Tell us about the kabab, biryani and delivery at {restaurant} in Jolshiri, Purbachal. Reviews appear once the team has approved them.',
     'reviews.form_title' => 'Write a review',
     'reviews.name' => 'Your name',
     'reviews.rating' => 'Rating',
@@ -277,6 +288,7 @@ return [
 
     // Contact --------------------------------------------------------------
     'contact.title' => 'Contact us',
+    'contact.meta_description' => 'Phone numbers, address, opening hours and delivery area for {restaurant} in Jolshiri, Purbachal. Ask about party bookings or an existing order.',
     'contact.subtitle' => 'Questions about delivery, catering or an existing order? Reach out.',
     'contact.phone' => 'Phone',
     'contact.whatsapp' => 'WhatsApp',

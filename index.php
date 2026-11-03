@@ -41,8 +41,8 @@ $reviews = fetch_all(
 $dishCount = (int) fetch_value('SELECT COUNT(*) FROM menu_items WHERE is_available = 1', [], 0);
 $categoryCount = count($categories);
 
-$pageTitle = '';
-$pageDescription = restaurant('description');
+$titleTag = __('home.title_tag', ['restaurant' => restaurant_name()]);
+$pageDescription = __('home.meta_description');
 $activeNav = 'home';
 require DH_ROOT . '/includes/partials/site-head.php';
 require DH_ROOT . '/includes/partials/site-header.php';
@@ -147,7 +147,7 @@ require DH_ROOT . '/includes/partials/flash.php';
             <div class="stat"><b><?= e(__('home.stat_delivery_value')) ?></b><span><?= e(__('home.stat_delivery')) ?></span></div>
           </div>
         </div>
-        <img src="<?= e(menu_image_url('menu/chicken-biryani.webp')) ?>" alt="<?= e(__('home.hero_image_alt')) ?>" width="1200" height="900" loading="lazy">
+        <img src="<?= e(menu_image_url('menu/chicken-biryani.webp')) ?>" alt="<?= e(__('home.cta_image_alt')) ?>" width="1200" height="900" loading="lazy" decoding="async">
       </div>
     </div>
   </section>

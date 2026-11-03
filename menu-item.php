@@ -18,24 +18,7 @@ $dish = $itemId > 0 ? fetch_one(
 ) : null;
 
 if ($dish === null) {
-    http_response_code(404);
-    $pageTitle = __('error.not_found');
-    $activeNav = 'menu';
-    require DH_ROOT . '/includes/partials/site-head.php';
-    require DH_ROOT . '/includes/partials/site-header.php';
-    ?>
-    <main id="main" class="container section">
-      <div class="card card-pad">
-        <div class="empty-state">
-          <span class="icon-tile"><?= icon('info') ?></span>
-          <h1><?= e(__('dish.not_found')) ?></h1>
-          <a class="btn" href="<?= e(url('menu.php')) ?>"><?= e(__('dish.back_to_menu')) ?></a>
-        </div>
-      </div>
-    </main>
-    <?php
-    require DH_ROOT . '/includes/partials/site-footer.php';
-    exit;
+    require DH_ROOT . '/includes/partials/not-found.php';
 }
 
 $mainDish = $dish;
@@ -58,6 +41,16 @@ $related = fetch_all(
 
 $pageTitle = item_name($dish);
 $pageDescription = item_description($dish);
+if ($pageDescription === '') {
+    // Dishes without a write-up still need a description, otherwise Google
+    // composes one from page noise. This one states only what the page shows.
+    $pageDescription = __('dish.meta_description', [
+        'dish' => item_name($dish),
+        'category' => localized($dish, 'category_name'),
+        'price' => money_from_decimal((string) $dish['price']),
+        'restaurant' => restaurant_name(),
+    ]);
+}
 $ogImage = menu_image_url($dish['image_path'] ?? null);
 // Scrapers will not render the SVG placeholder, so fall back to the share card.
 if (str_ends_with(strtolower($ogImage), '.svg')) {

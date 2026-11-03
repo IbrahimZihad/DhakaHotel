@@ -8,7 +8,7 @@ declare(strict_types=1);
 require __DIR__ . '/includes/bootstrap.php';
 
 $pageTitle = __('about.title');
-$pageDescription = restaurant('description');
+$pageDescription = __('about.meta_description', ['restaurant' => restaurant_name()]);
 $activeNav = 'about';
 require DH_ROOT . '/includes/partials/site-head.php';
 require DH_ROOT . '/includes/partials/site-header.php';

@@ -53,7 +53,7 @@ if ($debug) {
     });
 }
 
-if ($isCli) {
+if ($isCli || defined('DH_MACHINE_READABLE')) {
     return;
 }
 

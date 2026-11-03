@@ -15,7 +15,7 @@ $hours = restaurant('hours');
 $waLink = whatsapp_link(__('nav.whatsapp'));
 
 $pageTitle = __('contact.title');
-$pageDescription = __('contact.subtitle');
+$pageDescription = __('contact.meta_description', ['restaurant' => restaurant_name()]);
 $activeNav = 'contact';
 require DH_ROOT . '/includes/partials/site-head.php';
 require DH_ROOT . '/includes/partials/site-header.php';
