@@ -58,11 +58,14 @@ services:
         value: required
       - key: DB_SSL_VERIFY_SERVER_CERT
         value: "true"
-      # The Aiven Project CA, git-ignored so it cannot ship in the image. Paste
-      # the whole PEM (including -----BEGIN/END----- lines) as one secret value;
-      # the entrypoint writes it to /etc/dhaka/ca.pem and sets DB_SSL_CA.
-      - key: DB_SSL_CA_PEM
-        sync: false
+      # The Aiven Project CA. Add it under Environment -> Secret Files as a file
+      # named ca.pem; Render mounts secret files at /etc/secrets/<filename>.
+      # Do NOT put the PEM in a multi-line env value: the newlines get flattened
+      # on the way in and mysqlnd answers "Cannot connect to MySQL using SSL".
+      # The entrypoint also accepts a single-line DB_SSL_CA_PEM_B64 if you would
+      # rather not use a Secret File.
+      - key: DB_SSL_CA
+        value: /etc/secrets/ca.pem
 
       # Render terminates TLS, so the cookie must be Secure even though Apache
       # only ever sees plain HTTP on its internal port.
@@ -138,8 +141,10 @@ services:
         value: required
       - key: DB_SSL_VERIFY_SERVER_CERT
         value: "true"
-      - key: DB_SSL_CA_PEM
-        sync: false
+      # Same Secret File as the web service; add it here too if this cron service
+      # is created separately.
+      - key: DB_SSL_CA
+        value: /etc/secrets/ca.pem
       - key: MAIL_HOST
         sync: false
       - key: MAIL_PORT

@@ -34,7 +34,15 @@ function db_ssl_options(array $cfg): array
     }
 
     if (!is_file($ca)) {
-        throw new PDOException('Database CA certificate not found at ' . $ca);
+        // Containers get no certs/ folder, so a DB_SSL_CA copied from a local
+        // .env names a file that can never exist there; DB_SSL_CA_PEM is the
+        // portable form and the entrypoint turns it back into a file.
+        throw new PDOException(sprintf(
+            'Database CA certificate not found at %s. Set DB_SSL_CA_PEM to the '
+            . 'certificate text itself (containers and PaaS), or point DB_SSL_CA '
+            . 'at a readable .pem file.',
+            $ca
+        ));
     }
 
     // PHP 8.5 deprecated the PDO::MYSQL_ATTR_* constants.
