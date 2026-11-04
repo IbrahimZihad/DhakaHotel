@@ -5,6 +5,50 @@
 
 declare(strict_types=1);
 
+/**
+ * PDO TLS options from the database config.
+ *
+ * A relative DB_SSL_CA is resolved against the project root because the working
+ * directory differs between Apache, the CLI and a scheduled worker, and mysqlnd
+ * reports a missing CA as a generic SSL failure.
+ */
+function db_ssl_options(array $cfg): array
+{
+    $mode = strtolower((string) ($cfg['ssl_mode'] ?? ''));
+    $ca = trim((string) ($cfg['ssl_ca'] ?? ''));
+
+    if ($ca !== '' && preg_match('#^(?:[a-z]:)?[\\\\/]#i', $ca) !== 1) {
+        $ca = DH_ROOT . DIRECTORY_SEPARATOR . str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $ca);
+    }
+
+    if (in_array($mode, ['disabled', 'none', 'off'], true)) {
+        return [];
+    }
+
+    if ($ca === '') {
+        if ($mode === 'required') {
+            throw new PDOException('DB_SSL_MODE=required needs DB_SSL_CA to point at the server CA certificate.');
+        }
+
+        return [];
+    }
+
+    if (!is_file($ca)) {
+        throw new PDOException('Database CA certificate not found at ' . $ca);
+    }
+
+    // PHP 8.5 deprecated the PDO::MYSQL_ATTR_* constants.
+    $attrCa = class_exists(Pdo\Mysql::class) ? Pdo\Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA;
+    $attrVerify = class_exists(Pdo\Mysql::class)
+        ? Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT
+        : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT;
+
+    return [
+        $attrCa => $ca,
+        $attrVerify => (bool) ($cfg['ssl_verify_server_cert'] ?? true),
+    ];
+}
+
 function db(): PDO
 {
     static $pdo = null;
@@ -29,18 +73,26 @@ function db(): PDO
         PDO::ATTR_STRINGIFY_FETCHES => false,
     ];
 
-    if (!empty($cfg['ssl_ca'])) {
-        $options[PDO::MYSQL_ATTR_SSL_CA] = $cfg['ssl_ca'];
-    }
-
     try {
+        $options += db_ssl_options($cfg);
+
         $pdo = new PDO($dsn, $cfg['user'], $cfg['password'], $options);
         $pdo->exec("SET time_zone = '+06:00'");
+
+        // Some managed databases accept unencrypted connections unless told
+        // otherwise, so 'required' is verified after the handshake instead of
+        // assumed from the options.
+        if (strtolower((string) ($cfg['ssl_mode'] ?? '')) === 'required') {
+            $row = $pdo->query("SHOW STATUS LIKE 'Ssl_cipher'")->fetch(PDO::FETCH_ASSOC);
+            if (trim((string) ($row['Value'] ?? '')) === '') {
+                throw new PDOException('DB_SSL_MODE=required but the server negotiated an unencrypted connection.');
+            }
+        }
     } catch (PDOException $exception) {
         storage_log('Database connection failed: ' . $exception->getMessage());
 
         if (PHP_SAPI === 'cli') {
-            fwrite(STDERR, "Database connection failed. Check your .env values.\n");
+            fwrite(STDERR, 'Database connection failed: ' . $exception->getMessage() . PHP_EOL);
             exit(1);
         }
 

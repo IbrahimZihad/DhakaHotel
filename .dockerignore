@@ -1,0 +1,31 @@
+# Local secrets and machine-only state must never enter the image.
+.env
+.env.local
+.aiven-client.cnf
+certs/
+
+# The Docker context is the app; history and tooling are not.
+.git/
+.gitignore
+.github/
+node_modules/
+tools/
+tests/
+qa/
+*.sql
+*.log
+
+# Built inside the image by composer; uploaded at runtime into the mounted disk.
+vendor/
+uploads/menu/*
+storage/
+
+# Not app code.
+Dockerfile
+.dockerignore
+docker-compose.yml
+render.yaml
+
+# NOTE: .htaccess is deliberately NOT ignored - Apache reads it at runtime and it
+# carries the folder, dotfile and execution denies. Ignoring it would ship a site
+# whose storage/logs/app.log is publicly downloadable.

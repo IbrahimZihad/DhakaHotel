@@ -1,0 +1,156 @@
+# Render Blueprint for the Dhaka Hotel app. Push this file to GitHub, then
+# "New + -> Blueprint" in the Render dashboard and pick the repo: Render reads
+# this and creates both services.
+#
+# Secrets are deliberately marked `sync: false`, which means Render creates the
+# key but leaves the value blank for you to enter in the dashboard. Nothing here
+# holds a credential, so the file is safe to commit.
+
+services:
+  - type: web
+    name: dhaka-hotel-web
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: singapore
+    plan: starter
+    healthCheckPath: /
+    envVars:
+      # Never true in production: with APP_DEBUG on, a fatal error prints the
+      # message and the SQL straight into the HTML body while still returning 200.
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_DEMO_MODE
+        value: "false"
+      - key: DEMO_RESET_ALLOWED
+        value: "false"
+      # Absolute public origin, no trailing slash. Drives og:url, canonical and
+      # sitemap <loc>; if it is wrong the site publishes someone else's domain.
+      - key: APP_URL
+        value: https://REPLACE-WITH-YOUR-RENDER-DOMAIN.onrender.com
+      # Comma-separated hostnames allowed in generated absolute URLs. Add the
+      # custom domain here when the restaurant gets one.
+      - key: TRUSTED_HOSTS
+        value: REPLACE-WITH-YOUR-RENDER-DOMAIN.onrender.com
+      # The container serves the app from the document root, so no subfolder.
+      # This is what the XAMPP /DhakaHotel prefix must become.
+      - key: APP_BASE_PATH
+        value: ""
+      - key: APP_TIMEZONE
+        value: Asia/Dhaka
+      - key: APP_ASSET_VERSION
+        value: "1.0.13"
+
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "27437"
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_CHARSET
+        value: utf8mb4
+      - key: DB_SSL_MODE
+        value: required
+      - key: DB_SSL_VERIFY_SERVER_CERT
+        value: "true"
+      # The Aiven Project CA, git-ignored so it cannot ship in the image. Paste
+      # the whole PEM (including -----BEGIN/END----- lines) as one secret value;
+      # the entrypoint writes it to /etc/dhaka/ca.pem and sets DB_SSL_CA.
+      - key: DB_SSL_CA_PEM
+        sync: false
+
+      # Render terminates TLS, so the cookie must be Secure even though Apache
+      # only ever sees plain HTTP on its internal port.
+      - key: SESSION_SECURE
+        value: "true"
+      - key: SESSION_SAMESITE
+        value: Lax
+      - key: SESSION_LIFETIME
+        value: "7200"
+      - key: SESSION_NAME
+        value: dhakahotelsessid
+
+      - key: OWNER_EMAIL
+        sync: false
+      - key: OWNER_WHATSAPP
+        sync: false
+      - key: MAIL_HOST
+        sync: false
+      - key: MAIL_PORT
+        value: "587"
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_ENCRYPTION
+        value: tls
+      - key: MAIL_FROM_ADDRESS
+        sync: false
+      - key: MAIL_FROM_NAME
+        value: Dhaka Hotel
+
+    # A Render Disk keeps uploaded dish photos and logs across deploys. Without
+    # it every deploy wipes uploads/ while the image_path rows survive, and the
+    # storefront silently falls back to placeholder.svg.
+    # Disks pin the service to ONE instance - do not scale this service out.
+    disks:
+      - name: app-uploads
+        mountPath: /var/www/html/uploads
+        sizeGB: 1
+      - name: app-storage
+        mountPath: /var/www/html/storage
+        sizeGB: 1
+
+  # The payment/receipt email queue is a DB-backed job table; nothing drains it
+  # without a scheduled run. Render cron jobs are separate services, so this
+  # rebuilds the same image and runs one command per tick.
+  - type: cron
+    name: dhaka-hotel-email-queue
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: singapore
+    plan: starter
+    schedule: "*/10 * * * *"
+    startCommand: php scripts/process_email_queue.php --limit=20
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "27437"
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_CHARSET
+        value: utf8mb4
+      - key: DB_SSL_MODE
+        value: required
+      - key: DB_SSL_VERIFY_SERVER_CERT
+        value: "true"
+      - key: DB_SSL_CA_PEM
+        sync: false
+      - key: MAIL_HOST
+        sync: false
+      - key: MAIL_PORT
+        value: "587"
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_ENCRYPTION
+        value: tls
+      - key: MAIL_FROM_ADDRESS
+        sync: false
+      - key: MAIL_FROM_NAME
+        value: Dhaka Hotel

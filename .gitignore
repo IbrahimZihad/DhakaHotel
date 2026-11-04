@@ -1,6 +1,9 @@
 # Local environment (never commit credentials)
 .env
 
+# Database TLS bundles downloaded from the hosting provider
+/certs/
+
 # Composer
 /vendor/
 
@@ -19,3 +22,4 @@ Thumbs.db
 # Local tooling
 /tools/
 /node_modules/
+

@@ -3,8 +3,11 @@
 declare(strict_types=1);
 
 return [
-    'env' => (string) env('APP_ENV', 'local'),
-    'debug' => (bool) env('APP_DEBUG', true),
+    'env' => (string) env('APP_ENV', 'production'),
+    // Both defaults are the safe half. A host without a .env file (Render,
+    // containers, CI) must not end up printing stack traces or serving demo
+    // content; the local .env opts in explicitly.
+    'debug' => (bool) env('APP_DEBUG', false),
     'base_path' => rtrim((string) env('APP_BASE_PATH', ''), '/'),
     'url' => rtrim((string) env('APP_URL', ''), '/'),
     'trusted_hosts' => array_values(array_filter(
@@ -12,7 +15,7 @@ return [
         static fn (string $host): bool => $host !== ''
     )),
     'timezone' => (string) env('APP_TIMEZONE', 'Asia/Dhaka'),
-    'demo_mode' => (bool) env('APP_DEMO_MODE', true),
+    'demo_mode' => (bool) env('APP_DEMO_MODE', false),
     'default_lang' => 'bn',
     'languages' => ['bn', 'en'],
     'asset_version' => (string) env('APP_ASSET_VERSION', '1.0.0'),

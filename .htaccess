@@ -16,8 +16,10 @@ ServerSignature Off
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # Source, tooling and runtime folders are never served directly.
-  RewriteRule ^(config|database|includes|tests|vendor|storage|tools|scripts)(/|$) - [F,L]
+  # Source, tooling and runtime folders are never served directly. `certs` holds
+  # the database CA bundle: public information, but nothing to advertise and it
+  # must not be one `mv` away from holding a client key.
+  RewriteRule ^(config|database|includes|tests|vendor|storage|tools|scripts|certs)(/|$) - [F,L]
 
   # Dot-prefixed path segments (.git/, .env.local, editor backups) are denied on
   # the request path, not only by filename: the repository folder sat under the
