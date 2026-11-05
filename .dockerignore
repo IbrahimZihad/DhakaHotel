@@ -2,7 +2,11 @@
 .env
 .env.local
 .aiven-client.cnf
-certs/
+# certs/*ca*.pem is deliberately shipped: it is the database trust anchor, it
+# contains no key, and .htaccess denies the folder over HTTP. Keys never ship.
+certs/*key*
+certs/*.p12
+certs/*.pfx
 
 # The Docker context is the app; history and tooling are not.
 .git/

@@ -96,8 +96,10 @@ The app talks to MySQL over PDO with the same code whether the server is on
 2. **Download the Project CA certificate** from the Aiven console (Service →
    CA Certificate) and save it as `certs/ca.pem`. A relative `DB_SSL_CA` is
    resolved from the project root, so the same value works under Apache, from the
-   CLI and from a scheduled worker. `certs/` is git-ignored and blocked from the
-   web by the bundled `.htaccess`.
+   CLI and from a scheduled worker. The bundle is committed on purpose - it is a
+   public trust anchor with no key in it, and shipping it in the image is what
+   keeps a container away from fragile multi-line secrets - and `.htaccess`
+   denies `/certs/` over HTTP.
 
 3. **Migrate, then check:**
 
@@ -258,8 +260,8 @@ The app ships a production image so it can run on any Docker host, Render includ
 | File | What it does |
 | --- | --- |
 | `Dockerfile` | `php:8.5-apache` + `pdo_mysql`, `mbstring`, `zip`; hardened PHP and Apache config; `composer install --no-dev --optimize-autoloader` at build time; deletes `.git/` and `tests/` from the image |
-| `.dockerignore` | keeps `.env`, `certs/`, `.git/`, `storage/`, `uploads/menu/*`, `*.sql` and `vendor/` out of the build context |
-| `scripts/docker-entrypoint.sh` | writes the `DB_SSL_CA_PEM` secret to `/etc/dhaka/ca.pem` (640, `root:www-data`) and points `DB_SSL_CA` at it, moves Apache to `$PORT`, repairs `uploads/` and `storage/` ownership |
+| `.dockerignore` | keeps `.env`, `.git/`, `storage/`, `uploads/menu/*`, `*.sql` and `vendor/` out of the build context; from `certs/` it keeps keys and pkcs12 bundles, never the CA |
+| `scripts/docker-entrypoint.sh` | if `DB_SSL_CA_PEM` or `DB_SSL_CA_PEM_B64` is set, parses it with `openssl x509` and only then writes `/etc/dhaka/ca.pem` (640, `root:www-data`) and points `DB_SSL_CA` at it - an unparsable value is reported and cannot override a working `DB_SSL_CA`; also moves Apache to `$PORT` and repairs `uploads/` and `storage/` ownership |
 | `render.yaml` | Render blueprint: the web service plus the email-queue cron |
 
 `php:8.5-apache` (mod_php) is a deliberate choice, not an oversight. Every access rule in this project lives in `.htaccess` — the blocked folders, the dot-path deny, the "no PHP inside `uploads/`" guard, the security headers, the `application/manifest+json` type — and only Apache reads that file. Render's *native* PHP runtime is Nginx + PHP-FPM, which ignores `.htaccess` entirely, so switching the service to the native runtime un-does the audit one rule at a time, silently. Pin the 8.5 base image for the same reason: `PASSWORD_DEFAULT` there is bcrypt cost 12, which matches the fixed-cost timing comparison in the login path.
@@ -280,7 +282,7 @@ docker run -d --name dhaka-hotel -p 8080:8080 -e PORT=8080 --env-file C:\somewhe
   -e DB_SSL_CA_PEM="-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----" dhaka-hotel:local
 ```
 
-Checked against the live Aiven database with the CA delivered only as `DB_SSL_CA_PEM`: 11 public pages return 200 with no error text in the body; `storage/logs/`, `config/database.php`, `includes/functions.php`, `scripts/port_database.php`, `database/migrations/*.sql`, `.env`, `.git/config`, `tests/run.php`, `certs/ca.pem`, `vendor/autoload.php` and `composer.json` are all denied; `Server: Apache` with no `X-Powered-By`; assets cached, `service-worker.js` `no-cache`; Bangla renders correctly; admin login and session work.
+Checked against the live Aiven database with the CA read from `certs/ca.pem` inside the image: 11 public pages return 200 with no error text in the body; `storage/logs/`, `config/database.php`, `includes/functions.php`, `scripts/port_database.php`, `database/migrations/*.sql`, `.env`, `.git/config`, `tests/run.php`, `certs/ca.pem` (403 - the deny is real, not a missing file), `vendor/autoload.php` and `composer.json` are all denied; `Server: Apache` with no `X-Powered-By`; assets cached, `service-worker.js` `no-cache`; Bangla renders correctly; admin login and session work.
 
 Overriding the command on the same image runs the CLI the same way the Render cron service will, and the entrypoint still writes the CA first - `php database/migration_runner.php status` reported "10 migration file(s), 0 pending" against Aiven, and `php scripts/process_email_queue.php --limit=20` printed "Mailer state: unconfigured / Queued notifications were left untouched".
 
@@ -319,11 +321,11 @@ The image is Apache, so the `.htaccess` rules that were audited stay in force on
 2. Render dashboard → **Add New → Blueprint** → pick the repo. Render reads `render.yaml` and shows both services it will create.
 3. Before the first deploy, edit these values in the dashboard (they are blank in the blueprint on purpose): `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `OWNER_EMAIL`, `OWNER_WHATSAPP`, `MAIL_HOST`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS`, plus the CA from step 5. The web service *and* the cron service each need the `DB_*` and `MAIL_*` set — cron jobs are separate services and inherit nothing.
 4. Replace `REPLACE-WITH-YOUR-RENDER-DOMAIN` in `APP_URL` and `TRUSTED_HOSTS`. `APP_URL` feeds the canonical tag, `og:url`, `og:image` and the sitemap `<loc>` entries; if it still says `REPLACE-...` the site publishes a domain nobody owns. Add the custom domain to `TRUSTED_HOSTS` when the restaurant gets one, or a spoofed `Host` header is rejected from URL generation.
-5. Give the container the Aiven Project CA. **Use a Secret File, not a multi-line environment variable.** Dashboard → Environment → *Secret Files* → add a file named `ca.pem` with the certificate text, then set `DB_SSL_CA=/etc/secrets/ca.pem`. Render mounts secret files at `/etc/secrets/<filename>`, which is exactly what mysqlnd needs.
-   A pasted multi-line env value is the trap here: something between the dashboard and the container flattens the newlines, the file stops being parseable, and the only symptom is `Cannot connect to MySQL using SSL`. The entrypoint now parses the text with `openssl x509` before trusting it, so a mangled `DB_SSL_CA_PEM` is reported in the deploy log and cannot override a working `DB_SSL_CA`. If you prefer an environment variable, use the single-line form: `DB_SSL_CA_PEM_B64` = `base64 -w0 certs/ca.pem` output, which cannot be flattened.
+5. Leave the CA alone. `certs/ca.pem` is committed and ships inside the image, and `render.yaml` sets `DB_SSL_CA=/var/www/html/certs/ca.pem`, so there is nothing to paste. `.htaccess` denies `/certs/` (403, verified), and the file is a public trust anchor with no key in it - the ignore rules in `.gitignore` and `.dockerignore` allow only `*ca*.pem` through and always exclude anything with `key` in its name.
+   Two alternatives exist if you would rather not keep the bundle in the repository: a Render **Secret File** named `ca.pem` (mounted at `/etc/secrets/ca.pem`, point `DB_SSL_CA` there), or the single-line `DB_SSL_CA_PEM_B64` = `base64 -w0 certs/ca.pem`. Render mounts secret files `root:root` mode `0400`, which the Apache workers (`www-data`) cannot read, so the Secret File route only works with the current entrypoint: it copies whatever `DB_SSL_CA` points at into `/etc/dhaka/ca.pem`, group-readable, and re-exports the path. What you must not do is put a multi-line PEM in an environment variable: something between the dashboard and the container flattens the newlines, and mysqlnd's only complaint is `Cannot connect to MySQL using SSL`. The entrypoint parses any certificate text with `openssl x509` first and refuses to use it - or to override a working `DB_SSL_CA` - when it does not parse.
 6. Deploy. Render builds the image, and the container listens on the port it is given; `PORT` is set by Render automatically, and the entrypoint rewrites Apache's `Listen` and `<VirtualHost>` to match.
 7. Apply the schema (the one-off container command above), then load the content. `scripts/port_database.php` reads the local XAMPP database and writes to whatever `.env` points at, so run it from the machine that has both - not from the container, which has no local MySQL to copy from. Never seed demo data into the live database.
-8. Watch **Shell** in the service for the first minute after deploy. `require_secure_transport` on Aiven and a wrong `DB_SSL_*` combination both surface as a connection failure with nothing on the page.
+8. Watch **Logs** in the service for the first minute after deploy; **Shell** needs a paid plan. `require_secure_transport` on Aiven and a wrong `DB_SSL_*` combination both surface as a connection failure with nothing on the page.
 
 ### If the site comes up with "Service temporarily unavailable"
 
@@ -331,9 +333,9 @@ The page prints the reason only while `APP_DEBUG=true`, so read it once, fix the
 
 | What the page says | What it means | The fix |
 | --- | --- | --- |
-| `Database CA certificate not found at /var/www/html/certs/ca.pem` | `DB_SSL_CA` was copied from the local `.env`. There is no `certs/` inside the image - it is excluded from the build context, and a path-only variable cannot carry the certificate to a container. | Follow step 5: a Secret File at `/etc/secrets/ca.pem` with `DB_SSL_CA` set to that path. |
+| `Database CA certificate not found at /var/www/html/certs/ca.pem` | The deployed image predates the bundled CA, or `certs/ca.pem` was never committed, so the file the blueprint points at is not in the image. | Commit `certs/ca.pem`, redeploy, and confirm `DB_SSL_CA=/var/www/html/certs/ca.pem`. |
 | Any internal detail visible at all | `APP_DEBUG` is on in production, which prints filesystem paths and SQL into customer-facing HTML. | `APP_DEBUG=false`, `APP_ENV=production`. |
-| `SQLSTATE[HY000] [2002] Cannot connect to MySQL using SSL` | mysqlnd could not use the CA file. Either the multi-line `DB_SSL_CA_PEM` value had its newlines flattened on the way in, or the container clock is outside the CA's validity window. | Switch to the Secret File (step 5) or `DB_SSL_CA_PEM_B64`. The deploy log says `dhaka: DB_SSL_CA_PEM is not a parseable PEM certificate` when it is the newline problem; nothing is printed for a clock problem, so check the date. |
+| `SQLSTATE[HY000] [2002] Cannot connect to MySQL using SSL` | mysqlnd was handed a CA file it could not use. The usual reason on a PaaS is ownership, not the certificate: Render mounts Secret Files `root:root` mode `0400`, the workers run as `www-data`, so `is_file()` passes and the handshake still fails. A flattened multi-line `DB_SSL_CA_PEM` looks identical, and so does a blocked port. | Deploy the current entrypoint, which re-stages any CA source as a group-readable `/etc/dhaka/ca.pem`. To fix a live Free service without waiting for a build, add `DB_SSL_CA_PEM_B64` (`base64 -w0 certs/ca.pem`) - one line survives the dashboard intact, and the entrypoint already knows how to use it. The unreadable-file case now raises "exists but the web process cannot read it" instead of the mysqlnd text, so the two are no longer confused. If a readable, valid CA still fails, the handshake never reached Aiven: that is egress or an allow-list. |
 | `Access denied for user` | `DB_PASSWORD` (or `DB_USER`/`DB_NAME`) is blank - the `sync: false` keys are created empty and stay empty until filled. | Fill every secret in the table in step 3, on both services. |
 | `DB_SSL_MODE=required but the server negotiated an unencrypted connection` | The server is not offering TLS. | Keep `required`; verify the host and port are the managed service's TLS endpoint. |
 

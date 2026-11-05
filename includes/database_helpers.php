@@ -45,6 +45,19 @@ function db_ssl_options(array $cfg): array
         ));
     }
 
+    if (!is_readable($ca)) {
+        // A PaaS secret file is root-owned and mode 0400, so the path passes
+        // is_file() and then mysqlnd answers only "Cannot connect to MySQL using
+        // SSL". Saying which is true keeps a permissions problem from looking
+        // like a certificate problem.
+        throw new PDOException(sprintf(
+            'Database CA certificate at %s exists but the web process cannot '
+            . 'read it. In a container, chmod it for the app user (or re-stage it '
+            . 'in the entrypoint), or set DB_SSL_CA_PEM instead.',
+            $ca
+        ));
+    }
+
     // PHP 8.5 deprecated the PDO::MYSQL_ATTR_* constants.
     $attrCa = class_exists(Pdo\Mysql::class) ? Pdo\Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA;
     $attrVerify = class_exists(Pdo\Mysql::class)

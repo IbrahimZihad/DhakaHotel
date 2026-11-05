@@ -3,13 +3,19 @@
 # disk brings with it. Runs as root, then hands off to Apache (workers = www-data).
 set -eu
 
-# The Aiven/Cloud provider CA is git-ignored, so it arrives as a secret env var
-# instead of a file in the image. Absolute path is honoured by db_ssl_options().
+# The database CA has to end up as a file the Apache workers (www-data) can
+# actually open, and each delivery route breaks in its own way:
 #
-# DB_SSL_CA_PEM_B64 exists because a multi-line value does not survive every
-# dashboard, copy-paste or CI layer: once the newlines are flattened mysqlnd
-# rejects the file and the only symptom is "Cannot connect to MySQL using SSL".
-# Base64 is one unbroken line, so it cannot be mangled that way.
+#   DB_SSL_CA_PEM / _B64   A dashboard paste can lose the newlines; mysqlnd then
+#                          reports only "Cannot connect to MySQL using SSL".
+#                          Base64 is one unbroken line, so it cannot be mangled
+#                          that way.
+#   DB_SSL_CA as a file    Render mounts Secret Files root-owned and mode 0400,
+#                          so /etc/secrets/ca.pem exists, passes is_file(), and
+#                          still cannot be read by the worker.
+#
+# Whatever the source, re-stage it here as root and hand the workers a group-
+# readable copy, after proving it parses as a certificate.
 CA_TEXT=''
 CA_SOURCE=''
 if [ -n "${DB_SSL_CA_PEM_B64:-}" ]; then
@@ -18,9 +24,13 @@ if [ -n "${DB_SSL_CA_PEM_B64:-}" ]; then
 elif [ -n "${DB_SSL_CA_PEM:-}" ]; then
     CA_TEXT="$DB_SSL_CA_PEM"
     CA_SOURCE=DB_SSL_CA_PEM
+elif [ -n "${DB_SSL_CA:-}" ] && [ -f "${DB_SSL_CA}" ]; then
+    CA_TEXT=$(cat "${DB_SSL_CA}")
+    CA_SOURCE="file ${DB_SSL_CA}"
 fi
 
 if [ -n "$CA_TEXT" ]; then
+    mkdir -p /etc/dhaka
     umask 027
     printf '%s\n' "$CA_TEXT" > /etc/dhaka/ca.pem
     if openssl x509 -in /etc/dhaka/ca.pem -noout >/dev/null 2>&1; then

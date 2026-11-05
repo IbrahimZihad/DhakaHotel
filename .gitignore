@@ -1,8 +1,13 @@
 # Local environment (never commit credentials)
 .env
 
-# Database TLS bundles downloaded from the hosting provider
-/certs/
+# Database TLS material from the hosting provider. The CA bundle is tracked on
+# purpose: it is a public trust anchor with no key in it, and shipping it in the
+# image is the only CA route that survives a dashboard paste. Everything else -
+# private keys, client certificates, pkcs12 bundles - stays out of history.
+/certs/*
+!/certs/*ca*.pem
+/certs/*key*
 
 # Composer
 /vendor/

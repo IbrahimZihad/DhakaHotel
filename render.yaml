@@ -58,14 +58,12 @@ services:
         value: required
       - key: DB_SSL_VERIFY_SERVER_CERT
         value: "true"
-      # The Aiven Project CA. Add it under Environment -> Secret Files as a file
-      # named ca.pem; Render mounts secret files at /etc/secrets/<filename>.
-      # Do NOT put the PEM in a multi-line env value: the newlines get flattened
-      # on the way in and mysqlnd answers "Cannot connect to MySQL using SSL".
-      # The entrypoint also accepts a single-line DB_SSL_CA_PEM_B64 if you would
-      # rather not use a Secret File.
+      # The Aiven Project CA ships inside the image (certs/ca.pem is tracked;
+      # .htaccess denies the folder over HTTP). Nothing to paste, so nothing to
+      # mangle. Override this only if you prefer a Render Secret File
+      # (/etc/secrets/ca.pem) or the single-line DB_SSL_CA_PEM_B64 fallback.
       - key: DB_SSL_CA
-        value: /etc/secrets/ca.pem
+        value: /var/www/html/certs/ca.pem
 
       # Render terminates TLS, so the cookie must be Secure even though Apache
       # only ever sees plain HTTP on its internal port.
@@ -141,10 +139,9 @@ services:
         value: required
       - key: DB_SSL_VERIFY_SERVER_CERT
         value: "true"
-      # Same Secret File as the web service; add it here too if this cron service
-      # is created separately.
+      # Same CA bundle as the web service; it is inside this image too.
       - key: DB_SSL_CA
-        value: /etc/secrets/ca.pem
+        value: /var/www/html/certs/ca.pem
       - key: MAIL_HOST
         sync: false
       - key: MAIL_PORT
